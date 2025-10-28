@@ -432,6 +432,20 @@ export default function CrewInspectionChecklist() {
     return branchCrews.sort();
   };
 
+  // Helper function to get cell background color
+  const getCellBackgroundClass = (currentValue, cellValue) => {
+    if (currentValue === cellValue) {
+      if (cellValue === 'yes' || cellValue === 'good') {
+        return 'bg-green-100';
+      } else if (cellValue === 'no' || cellValue === 'bad' || cellValue === 'missing' || cellValue === 'not-working') {
+        return 'bg-red-100';
+      } else if (cellValue === 'needs-work' || cellValue === 'need-service') {
+        return 'bg-yellow-100';
+      }
+    }
+    return '';
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -746,7 +760,7 @@ export default function CrewInspectionChecklist() {
                           {label}
                         </td>
                         {['yes', 'no'].map((value) => (
-                          <td key={value} className="border border-slate-300 px-3 md:px-4 py-2 text-center">
+                          <td key={value} className={`border border-slate-300 px-3 md:px-4 py-2 text-center ${getCellBackgroundClass(formData[key], value)}`}>
                             <input
                               type="radio"
                               name={key}
@@ -815,7 +829,7 @@ export default function CrewInspectionChecklist() {
                           {label}
                         </td>
                         {['yes', 'no'].map((value) => (
-                          <td key={value} className="border border-slate-300 px-3 md:px-4 py-2 text-center">
+                          <td key={value} className={`border border-slate-300 px-3 md:px-4 py-2 text-center ${getCellBackgroundClass(formData[key], value)}`}>
                             <input
                               type="radio"
                               name={key}
@@ -890,7 +904,7 @@ export default function CrewInspectionChecklist() {
                           {label}
                         </td>
                         {['good', 'bad', 'missing', 'not-working', 'needs-work'].map((condition) => (
-                          <td key={condition} className="border border-slate-300 px-2 md:px-4 py-2 text-center">
+                          <td key={condition} className={`border border-slate-300 px-2 md:px-4 py-2 text-center ${getCellBackgroundClass(formData[key], condition)}`}>
                             <input
                               type="radio"
                               name={key}
@@ -960,7 +974,7 @@ export default function CrewInspectionChecklist() {
                           {label}
                         </td>
                         {['good', 'bad', 'missing', 'need-service'].map((condition) => (
-                          <td key={condition} className="border border-slate-300 px-2 md:px-4 py-2 text-center">
+                          <td key={condition} className={`border border-slate-300 px-2 md:px-4 py-2 text-center ${getCellBackgroundClass(formData[key], condition)}`}>
                             <input
                               type="radio"
                               name={key}
@@ -1037,7 +1051,7 @@ export default function CrewInspectionChecklist() {
                           {label}
                         </td>
                         {['yes', 'no', 'good', 'bad', 'needs-work', 'needs-attention'].map((condition) => (
-                          <td key={condition} className="border border-slate-300 px-2 md:px-4 py-2 text-center">
+                          <td key={condition} className={`border border-slate-300 px-2 md:px-4 py-2 text-center ${getCellBackgroundClass(formData[key], condition)}`}>
                             <input
                               type="radio"
                               name={key}
@@ -1114,7 +1128,7 @@ export default function CrewInspectionChecklist() {
                           {label}
                         </td>
                         {['good', 'bad', 'needs-work', 'missing', 'need'].map((condition) => (
-                          <td key={condition} className="border border-slate-300 px-2 md:px-4 py-2 text-center">
+                          <td key={condition} className={`border border-slate-300 px-2 md:px-4 py-2 text-center ${getCellBackgroundClass(formData[key], condition)}`}>
                             <input
                               type="radio"
                               name={key}
