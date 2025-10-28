@@ -721,16 +721,16 @@ export default function CrewInspectionChecklist() {
               </h2>
               
               <div className="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0">
-                <table className="w-full border-collapse min-w-[600px]">
+                <table className="w-full border-collapse min-w-[600px] table-fixed">
                   <thead>
                     <tr className="bg-slate-100">
-                      <th className="border border-slate-300 px-3 md:px-4 py-2 text-left text-xs md:text-sm font-medium text-slate-700">
+                      <th className="border border-slate-300 px-3 md:px-4 py-2 text-left text-xs md:text-sm font-medium text-slate-700 w-[55%]">
                         {t.item}
                       </th>
-                      <th className="border border-slate-300 px-3 md:px-4 py-2 text-center text-xs md:text-sm font-medium text-slate-700">
+                      <th className="border border-slate-300 px-3 md:px-4 py-2 text-center text-xs md:text-sm font-medium text-slate-700 w-[22.5%]">
                         {t.yes}
                       </th>
-                      <th className="border border-slate-300 px-3 md:px-4 py-2 text-center text-xs md:text-sm font-medium text-slate-700">
+                      <th className="border border-slate-300 px-3 md:px-4 py-2 text-center text-xs md:text-sm font-medium text-slate-700 w-[22.5%]">
                         {t.no}
                       </th>
                     </tr>
@@ -788,16 +788,16 @@ export default function CrewInspectionChecklist() {
               </p>
               
               <div className="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0">
-                <table className="w-full border-collapse min-w-[600px]">
+                <table className="w-full border-collapse min-w-[600px] table-fixed">
                   <thead>
                     <tr className="bg-slate-100">
-                      <th className="border border-slate-300 px-3 md:px-4 py-2 text-left text-xs md:text-sm font-medium text-slate-700">
+                      <th className="border border-slate-300 px-3 md:px-4 py-2 text-left text-xs md:text-sm font-medium text-slate-700 w-[55%]">
                         {t.ppeItem}
                       </th>
-                      <th className="border border-slate-300 px-3 md:px-4 py-2 text-center text-xs md:text-sm font-medium text-slate-700">
+                      <th className="border border-slate-300 px-3 md:px-4 py-2 text-center text-xs md:text-sm font-medium text-slate-700 w-[22.5%]">
                         {t.yes}
                       </th>
-                      <th className="border border-slate-300 px-3 md:px-4 py-2 text-center text-xs md:text-sm font-medium text-slate-700">
+                      <th className="border border-slate-300 px-3 md:px-4 py-2 text-center text-xs md:text-sm font-medium text-slate-700 w-[22.5%]">
                         {t.no}
                       </th>
                     </tr>
