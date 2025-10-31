@@ -763,8 +763,11 @@ export default function InspectionReports() {
                           <p className="font-semibold text-slate-800 text-sm truncate">{inspection.inspected_by}</p>
                           <p className="text-xs text-slate-600 mt-1">{formatDate(inspection.inspection_date)}</p>
                         </div>
-                        <div className="ml-2 flex-shrink-0">
+                        <div className="ml-2 flex-shrink-0 flex items-center gap-2">
                           {getSafetyBadge(inspection.safety_issue_asap)}
+                          {inspection.google_photos_link && (
+                            <span className="text-base" title="Photos available">📸</span>
+                          )}
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-2 text-xs mb-3">
@@ -833,6 +836,9 @@ export default function InspectionReports() {
                       </td>
                       <td className="px-4 py-3 text-center">
                         {getSafetyBadge(inspection.safety_issue_asap)}
+                        {inspection.google_photos_link && (
+                          <span className="text-base ml-2" title="Photos available">📸</span>
+                        )}
                       </td>
                     </tr>,
                     expandedInspectionId === inspection.id && (
