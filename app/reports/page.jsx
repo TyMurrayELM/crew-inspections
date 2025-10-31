@@ -324,6 +324,26 @@ export default function InspectionReports() {
         </div>
       </div>
 
+      {/* Photos */}
+      {inspection.google_photos_link && (
+        <div>
+          <h3 className="text-base md:text-lg font-semibold text-slate-800 mb-3 border-b-2 border-blue-600 pb-2">Photos</h3>
+          <div className="p-3 bg-green-50 border border-green-200 rounded">
+            <p className="text-xs md:text-sm text-green-700">
+              <span className="font-medium">📸 Photo Album Link:</span>{' '}
+              <a 
+                href={inspection.google_photos_link} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:text-blue-800 underline break-all"
+              >
+                {inspection.google_photos_link}
+              </a>
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Safety Equipment */}
       <div>
         <h3 className="text-base md:text-lg font-semibold text-slate-800 mb-3 border-b-2 border-blue-600 pb-2">Safety Equipment</h3>
@@ -353,7 +373,7 @@ export default function InspectionReports() {
           </div>
         </div>
         {inspection.ladder_notes && (
-          <div className="mt-3 p-3 bg-white rounded">
+          <div className="mt-3 p-3 bg-yellow-50 rounded">
             <p className="text-xs md:text-sm text-slate-600 font-medium mb-1">Notes:</p>
             <p className="text-xs md:text-sm text-slate-700">{inspection.ladder_notes}</p>
           </div>
@@ -386,7 +406,7 @@ export default function InspectionReports() {
           </div>
         </div>
         {inspection.ppe_notes && (
-          <div className="mt-3 p-3 bg-white rounded">
+          <div className="mt-3 p-3 bg-yellow-50 rounded">
             <p className="text-xs md:text-sm text-slate-600 font-medium mb-1">Notes:</p>
             <p className="text-xs md:text-sm text-slate-700">{inspection.ppe_notes}</p>
           </div>
@@ -442,7 +462,7 @@ export default function InspectionReports() {
           </div>
         </div>
         {inspection.emergency_equipment_notes && (
-          <div className="mt-3 p-3 bg-white rounded">
+          <div className="mt-3 p-3 bg-yellow-50 rounded">
             <p className="text-xs md:text-sm text-slate-600 font-medium mb-1">Notes:</p>
             <p className="text-xs md:text-sm text-slate-700">{inspection.emergency_equipment_notes}</p>
           </div>
@@ -475,7 +495,7 @@ export default function InspectionReports() {
           </div>
         </div>
         {inspection.vehicle_notes && (
-          <div className="mt-3 p-3 bg-white rounded">
+          <div className="mt-3 p-3 bg-yellow-50 rounded">
             <p className="text-xs md:text-sm text-slate-600 font-medium mb-1">Notes:</p>
             <p className="text-xs md:text-sm text-slate-700">{inspection.vehicle_notes}</p>
           </div>
@@ -520,7 +540,7 @@ export default function InspectionReports() {
           </div>
         </div>
         {inspection.trailer_notes && (
-          <div className="mt-3 p-3 bg-white rounded">
+          <div className="mt-3 p-3 bg-yellow-50 rounded">
             <p className="text-xs md:text-sm text-slate-600 font-medium mb-1">Notes:</p>
             <p className="text-xs md:text-sm text-slate-700">{inspection.trailer_notes}</p>
           </div>
@@ -555,7 +575,7 @@ export default function InspectionReports() {
         <div>
           <h3 className="text-base md:text-lg font-semibold text-slate-800 mb-3 border-b-2 border-blue-600 pb-2">Additional Information</h3>
           {inspection.additional_notes && (
-            <div className="mb-3 p-3 bg-white rounded">
+            <div className="mb-3 p-3 bg-yellow-50 rounded">
               <p className="text-xs md:text-sm text-slate-600 font-medium mb-1">Additional Notes:</p>
               <p className="text-xs md:text-sm text-slate-700">{inspection.additional_notes}</p>
             </div>
@@ -570,19 +590,6 @@ export default function InspectionReports() {
             <div className="mt-3 p-3 bg-blue-50 rounded">
               <p className="text-xs md:text-sm text-blue-600 font-medium mb-1">📅 Follow-Up Date:</p>
               <p className="text-xs md:text-sm text-blue-800">{formatDate(inspection.follow_up_date)}</p>
-            </div>
-          )}
-          {inspection.google_photos_link && (
-            <div className="mt-3 p-3 bg-purple-50 border border-purple-200 rounded">
-              <p className="text-xs md:text-sm text-purple-600 font-medium mb-2">📸 Google Photos:</p>
-              <a 
-                href={inspection.google_photos_link} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-xs md:text-sm text-blue-600 hover:text-blue-800 underline break-all"
-              >
-                {inspection.google_photos_link}
-              </a>
             </div>
           )}
         </div>
