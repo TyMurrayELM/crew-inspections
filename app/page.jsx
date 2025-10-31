@@ -548,7 +548,7 @@ export default function CrewInspectionChecklist() {
                 label: t.viewReports,
                 href: '/reports',
                 icon: FileText,
-                variant: 'outline',
+                variant: 'primary',
                 ariaLabel: 'View inspection reports',
               },
             ]}
