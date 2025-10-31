@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import Link from 'next/link';
+import Header from './components/Header';
+import { ClipboardList, FileText } from 'lucide-react';
 
 export default function CrewInspectionChecklist() {
   // Language state
@@ -12,7 +13,7 @@ export default function CrewInspectionChecklist() {
   const translations = {
     en: {
       title: "Crew Inspection Checklist",
-      viewReports: "📋 View Reports",
+      viewReports: "View Reports",
       
       // Inspection Information
       inspectionInfo: "Inspection Information",
@@ -124,7 +125,7 @@ export default function CrewInspectionChecklist() {
     },
     es: {
       title: "Lista de Verificación de Inspección de Equipo",
-      viewReports: "📋 Ver Reportes",
+      viewReports: "Ver Reportes",
       
       // Inspection Information
       inspectionInfo: "Información de Inspección",
@@ -536,48 +537,22 @@ export default function CrewInspectionChecklist() {
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-lg shadow-lg p-4 md:p-8">
           {/* Header */}
-          <div className="border-b-4 border-blue-700 pb-4 md:pb-6 mb-6 md:mb-8">
-            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 md:gap-4 mb-3 md:mb-4">
-              <div className="flex-1">
-                <div className="flex items-start justify-between mb-2">
-                  <h1 className="text-2xl md:text-3xl font-bold text-slate-800">
-                    {t.title}
-                  </h1>
-                  {/* Language Toggle - iPhone Style */}
-                  <div className="inline-flex rounded-lg border-2 border-slate-300 bg-slate-100 p-1">
-                    <button
-                      type="button"
-                      onClick={() => setLanguage('en')}
-                      className={`px-3 py-1 rounded-md text-sm font-semibold transition-all ${
-                        language === 'en'
-                          ? 'bg-blue-600 text-white shadow-sm'
-                          : 'text-slate-600 hover:text-slate-800'
-                      }`}
-                    >
-                      EN
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setLanguage('es')}
-                      className={`px-3 py-1 rounded-md text-sm font-semibold transition-all ${
-                        language === 'es'
-                          ? 'bg-blue-600 text-white shadow-sm'
-                          : 'text-slate-600 hover:text-slate-800'
-                      }`}
-                    >
-                      ES
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <Link
-                href="/reports"
-                className="px-4 md:px-6 py-2 md:py-3 bg-slate-100 text-slate-700 font-semibold rounded-md hover:bg-slate-200 border border-slate-300 transition-colors text-center whitespace-nowrap text-sm md:text-base"
-              >
-                {t.viewReports}
-              </Link>
-            </div>
-          </div>
+          <Header
+            title={t.title}
+            icon={ClipboardList}
+            showLanguageToggle={true}
+            language={language}
+            onLanguageChange={setLanguage}
+            actions={[
+              {
+                label: t.viewReports,
+                href: '/reports',
+                icon: FileText,
+                variant: 'primary',
+                ariaLabel: 'View inspection reports',
+              },
+            ]}
+          />
 
           <form onSubmit={handleSubmit} className="space-y-6 md:space-y-8">
             {/* Basic Information */}

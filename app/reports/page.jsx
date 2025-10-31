@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import Link from 'next/link';
+import Header from '../components/Header';
+import { FileText, Download, Plus } from 'lucide-react';
 
 export default function InspectionReports() {
   const [inspections, setInspections] = useState([]);
@@ -638,32 +639,32 @@ export default function InspectionReports() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 py-4 md:py-8 px-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
+        <Header
+          title="Inspection Reports"
+          subtitle={`${filteredInspections.length} ${filteredInspections.length === 1 ? 'report' : 'reports'} found`}
+          icon={FileText}
+          actions={[
+            {
+              label: 'Export to CSV',
+              onClick: exportToCSV,
+              disabled: filteredInspections.length === 0,
+              icon: Download,
+              variant: 'success',
+              ariaLabel: 'Export inspection reports to CSV file',
+            },
+            {
+              label: 'New Inspection',
+              href: '/',
+              icon: Plus,
+              variant: 'primary',
+              ariaLabel: 'Create a new inspection',
+            },
+          ]}
+        />
+
+        {/* Filters */}
         <div className="bg-white rounded-lg shadow-lg p-4 md:p-6 mb-4 md:mb-6">
           <div className="flex flex-col gap-3 mb-4 md:mb-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-slate-800">Inspection Reports</h1>
-                <p className="text-slate-600 mt-1 text-sm md:text-base">
-                  {filteredInspections.length} {filteredInspections.length === 1 ? 'report' : 'reports'} found
-                </p>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-2">
-                <button
-                  onClick={exportToCSV}
-                  disabled={filteredInspections.length === 0}
-                  className="px-4 md:px-6 py-2 md:py-3 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors text-center text-sm md:text-base"
-                >
-                  📥 Export to CSV
-                </button>
-                <Link
-                  href="/"
-                  className="px-4 md:px-6 py-2 md:py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition-colors text-center text-sm md:text-base"
-                >
-                  + New Inspection
-                </Link>
-              </div>
-            </div>
-
             {/* Filters */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               <input
