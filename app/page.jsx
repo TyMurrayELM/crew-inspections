@@ -13,7 +13,7 @@ export default function CrewInspectionChecklist() {
   const translations = {
     en: {
       title: "Crew Inspection Checklist",
-      viewReports: "📋 View Reports",
+      viewReports: "View Reports",
       
       // Inspection Information
       inspectionInfo: "Inspection Information",
@@ -125,7 +125,7 @@ export default function CrewInspectionChecklist() {
     },
     es: {
       title: "Lista de Verificación de Inspección de Equipo",
-      viewReports: "📋 Ver Reportes",
+      viewReports: "Ver Reportes",
       
       // Inspection Information
       inspectionInfo: "Información de Inspección",
