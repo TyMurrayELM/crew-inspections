@@ -139,6 +139,7 @@ export default function InspectionReports() {
       'Safety Issue ASAP',
       'Immediate Safety Issues',
       'Follow-Up Date',
+      'Google Photos Link',
       'Report ID',
       'Created At'
     ];
@@ -196,6 +197,7 @@ export default function InspectionReports() {
           inspection.safety_issue_asap || '',
           `"${(inspection.immediate_safety_issues || '').replace(/"/g, '""')}"`,
           formatDate(inspection.follow_up_date),
+          `"${(inspection.google_photos_link || '').replace(/"/g, '""')}"`,
           inspection.id || '',
           formatDateTime(inspection.created_at)
         ];
@@ -568,6 +570,19 @@ export default function InspectionReports() {
             <div className="mt-3 p-3 bg-blue-50 rounded">
               <p className="text-xs md:text-sm text-blue-600 font-medium mb-1">📅 Follow-Up Date:</p>
               <p className="text-xs md:text-sm text-blue-800">{formatDate(inspection.follow_up_date)}</p>
+            </div>
+          )}
+          {inspection.google_photos_link && (
+            <div className="mt-3 p-3 bg-purple-50 border border-purple-200 rounded">
+              <p className="text-xs md:text-sm text-purple-600 font-medium mb-2">📸 Google Photos:</p>
+              <a 
+                href={inspection.google_photos_link} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-xs md:text-sm text-blue-600 hover:text-blue-800 underline break-all"
+              >
+                {inspection.google_photos_link}
+              </a>
             </div>
           )}
         </div>

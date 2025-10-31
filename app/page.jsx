@@ -18,7 +18,7 @@ export default function CrewInspectionChecklist() {
       inspectionInfo: "Inspection Information",
       dateTime: "Date and Time of Inspection",
       inspectedBy: "Inspected By",
-      crewBranch: "Crew Branch Location",
+      crewBranch: "Crew Branch",
       crewObserved: "Crew Observed",
       selectBranchFirst: "Please select a branch first",
       selectCrew: "Select Crew",
@@ -113,6 +113,8 @@ export default function CrewInspectionChecklist() {
       immediateSafetyQuestion: "Are there any Safety issues observed that require immediate attention? Please Explain.",
       safetyConcernsPlaceholder: "Describe any immediate safety concerns...",
       followUpDate: "Follow-Up Required Date",
+      googlePhotosLink: "Google Photos Link",
+      googlePhotosPlaceholder: "Paste Google Photos album link here...",
       
       // Submit
       submitInspection: "Submit Inspection",
@@ -128,7 +130,7 @@ export default function CrewInspectionChecklist() {
       inspectionInfo: "Información de Inspección",
       dateTime: "Fecha y Hora de Inspección",
       inspectedBy: "Inspeccionado Por",
-      crewBranch: "Ubicación de Sucursal del Equipo",
+      crewBranch: "Sucursal del Equipo",
       crewObserved: "Equipo Observado",
       selectBranchFirst: "Por favor seleccione una sucursal primero",
       selectCrew: "Seleccionar Equipo",
@@ -223,6 +225,8 @@ export default function CrewInspectionChecklist() {
       immediateSafetyQuestion: "¿Hay algún problema de seguridad observado que requiera atención inmediata? Por favor explique.",
       safetyConcernsPlaceholder: "Describa cualquier preocupación de seguridad inmediata...",
       followUpDate: "Fecha de Seguimiento Requerida",
+      googlePhotosLink: "Enlace de Google Photos",
+      googlePhotosPlaceholder: "Pegue el enlace del álbum de Google Photos aquí...",
       
       // Submit
       submitInspection: "Enviar Inspección",
@@ -382,7 +386,8 @@ export default function CrewInspectionChecklist() {
     additionalNotes: '',
     immediateSafetyIssues: '',
     safetyIssueASAP: '',
-    followUpDate: ''
+    followUpDate: '',
+    googlePhotosLink: ''
   });
 
   const handleInputChange = (field, value) => {
@@ -501,7 +506,8 @@ export default function CrewInspectionChecklist() {
             additional_notes: formData.additionalNotes,
             immediate_safety_issues: formData.immediateSafetyIssues,
             safety_issue_asap: formData.safetyIssueASAP,
-            follow_up_date: formData.followUpDate || null
+            follow_up_date: formData.followUpDate || null,
+            google_photos_link: formData.googlePhotosLink
           }
         ])
         .select();
@@ -619,11 +625,12 @@ export default function CrewInspectionChecklist() {
                     className="w-full px-3 py-2 text-base border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     required
                   >
-                    <option value="">Select Location</option>
+                    <option value="">Select Branch</option>
                     <option value="phx-southwest">Phx - SouthWest</option>
                     <option value="phx-southeast">Phx - SouthEast</option>
                     <option value="phx-north">Phx - North</option>
                     <option value="las-vegas">Las Vegas</option>
+                    <option value="corporate">Corporate</option>
                   </select>
                 </div>
                 
@@ -1300,6 +1307,19 @@ export default function CrewInspectionChecklist() {
                   value={formData.followUpDate}
                   onChange={(e) => handleInputChange('followUpDate', e.target.value)}
                   className="w-full px-3 py-2 text-base border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  📸 {t.googlePhotosLink}
+                </label>
+                <input
+                  type="text"
+                  value={formData.googlePhotosLink}
+                  onChange={(e) => handleInputChange('googlePhotosLink', e.target.value)}
+                  className="w-full px-3 py-2 text-base border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder={t.googlePhotosPlaceholder}
                 />
               </div>
             </section>
