@@ -15,7 +15,6 @@ const supabase = createClient(
 export default function ReportsPage() {
   const [activeView, setActiveView] = useState('inspections'); // 'inspections' or 'gatechecks'
   const [inspections, setInspections] = useState([]);
-  const [gateChecks, setGateChecks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -25,23 +24,16 @@ export default function ReportsPage() {
   const [filterCrew, setFilterCrew] = useState('all');
   const [filterSafetyAlert, setFilterSafetyAlert] = useState('all');
   const [expandedInspectionId, setExpandedInspectionId] = useState(null);
-  const [expandedGateCheckId, setExpandedGateCheckId] = useState(null);
-  const [sortField, setSortField] = useState('inspection_date');
-  const [sortDirection, setSortDirection] = useState('desc');
 
   useEffect(() => {
-    if (activeView === 'inspections') {
-      fetchInspections();
-    } else {
-      fetchGateChecks();
-    }
-  }, [activeView]);
+    fetchInspections();
+  }, []);
 
   const fetchInspections = async () => {
     try {
       setLoading(true);
       const { data, error } = await supabase
-        .from('crew_inspections')
+        .from('inspections')
         .select('*')
         .order('inspection_date', { ascending: false });
 
@@ -49,24 +41,6 @@ export default function ReportsPage() {
       setInspections(data || []);
     } catch (error) {
       console.error('Error fetching inspections:', error);
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchGateChecks = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('gate_checks')
-        .select('*')
-        .order('inspection_date', { ascending: false });
-
-      if (error) throw error;
-      setGateChecks(data || []);
-    } catch (error) {
-      console.error('Error fetching gate checks:', error);
       setError(error.message);
     } finally {
       setLoading(false);
@@ -107,22 +81,19 @@ export default function ReportsPage() {
     return branchMap[branch] || branch;
   };
 
-  const getBranchBadge = (branchValue) => {
-    const branchConfig = {
-      'phx-north': { text: 'PHX N', color: 'bg-green-100 text-green-800 border-green-300' },
-      'phx-southwest': { text: 'PHX SW', color: 'bg-blue-100 text-blue-800 border-blue-300' },
-      'phx-southeast': { text: 'PHX SE', color: 'bg-red-100 text-red-800 border-red-300' },
-      'las-vegas': { text: 'Las Vegas', color: 'bg-yellow-100 text-yellow-800 border-yellow-300' },
-      'corporate': { text: 'Corporate', color: 'bg-gray-100 text-gray-800 border-gray-300' }
+  const getBranchBadge = (branch) => {
+    const badgeMap = {
+      'phx-southwest': 'bg-orange-100 text-orange-800',
+      'phx-southeast': 'bg-purple-100 text-purple-800',
+      'phx-north': 'bg-blue-100 text-blue-800',
+      'las-vegas': 'bg-green-100 text-green-800',
+      'corporate': 'bg-slate-100 text-slate-800'
     };
     
-    const config = branchConfig[branchValue] || { text: branchValue, color: 'bg-gray-100 text-gray-800 border-gray-300' };
+    const colorClass = badgeMap[branch] || 'bg-gray-100 text-gray-800';
+    const displayText = getBranchDisplay(branch);
     
-    return (
-      <span className={`px-2 py-1 text-xs font-semibold rounded border ${config.color}`}>
-        {config.text}
-      </span>
-    );
+    return <span className={`px-2 py-1 text-xs font-semibold rounded ${colorClass}`}>{displayText}</span>;
   };
 
   const exportToCSV = () => {
@@ -301,31 +272,10 @@ export default function ReportsPage() {
     setExpandedInspectionId(expandedInspectionId === inspectionId ? null : inspectionId);
   };
 
-  const toggleGateCheck = (gateCheckId) => {
-    setExpandedGateCheckId(expandedGateCheckId === gateCheckId ? null : gateCheckId);
-  };
-
-  const handleSort = (field) => {
-    if (sortField === field) {
-      // Toggle direction if clicking the same field
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      // New field, default to ascending
-      setSortField(field);
-      setSortDirection('asc');
-    }
-  };
-
   // Get unique values for filter dropdowns
   const uniqueDepartments = [...new Set(inspections.map(i => i.department).filter(Boolean))];
   const uniqueInspectors = [...new Set(inspections.map(i => i.inspected_by).filter(Boolean))];
   const uniqueCrews = [...new Set(inspections.map(i => i.crew_observed).filter(Boolean))];
-
-  // Get unique values for gate-check filters
-  const uniqueGateCheckLocations = [...new Set(gateChecks.map(g => g.location).filter(Boolean))];
-  const uniqueGateCheckDivisions = [...new Set(gateChecks.map(g => g.division).filter(Boolean))];
-  const uniqueGateCheckInspectors = [...new Set(gateChecks.map(g => g.inspected_by).filter(Boolean))];
-  const uniqueGateCheckCrews = [...new Set(gateChecks.map(g => g.crew_number).filter(Boolean))];
 
   // Filter inspections based on all filters
   const filteredInspections = inspections.filter(inspection => {
@@ -341,57 +291,6 @@ export default function ReportsPage() {
     const matchesSafetyAlert = filterSafetyAlert === 'all' || inspection.safety_issue_asap === filterSafetyAlert;
     
     return matchesSearch && matchesBranch && matchesDepartment && matchesInspector && matchesCrew && matchesSafetyAlert;
-  }).sort((a, b) => {
-    let aValue, bValue;
-    
-    switch (sortField) {
-      case 'inspection_date':
-        aValue = new Date(a.inspection_date || 0);
-        bValue = new Date(b.inspection_date || 0);
-        break;
-      case 'inspected_by':
-        aValue = (a.inspected_by || '').toLowerCase();
-        bValue = (b.inspected_by || '').toLowerCase();
-        break;
-      case 'crew_branch':
-        aValue = getBranchDisplay(a.crew_branch || '').toLowerCase();
-        bValue = getBranchDisplay(b.crew_branch || '').toLowerCase();
-        break;
-      case 'department':
-        aValue = getDepartmentDisplay(a.department || '').toLowerCase();
-        bValue = getDepartmentDisplay(b.department || '').toLowerCase();
-        break;
-      case 'crew_observed':
-        aValue = (a.crew_observed || '').toLowerCase();
-        bValue = (b.crew_observed || '').toLowerCase();
-        break;
-      case 'safety_issue_asap':
-        aValue = a.safety_issue_asap === 'yes' ? 0 : 1;
-        bValue = b.safety_issue_asap === 'yes' ? 0 : 1;
-        break;
-      default:
-        return 0;
-    }
-    
-    if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
-    if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
-    return 0;
-  });
-
-  // Filter gate-checks based on all filters
-  const filteredGateChecks = gateChecks.filter(gateCheck => {
-    const matchesSearch = 
-      gateCheck.inspected_by?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      gateCheck.division?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      gateCheck.crew_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      gateCheck.driver_name?.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesLocation = filterBranch === 'all' || gateCheck.location === filterBranch;
-    const matchesDivision = filterDepartment === 'all' || gateCheck.division === filterDepartment;
-    const matchesInspector = filterInspector === 'all' || gateCheck.inspected_by === filterInspector;
-    const matchesCrew = filterCrew === 'all' || gateCheck.crew_number === filterCrew;
-    
-    return matchesSearch && matchesLocation && matchesDivision && matchesInspector && matchesCrew;
   });
 
   // Chevron icon component
@@ -405,29 +304,6 @@ export default function ReportsPage() {
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
     </svg>
   );
-
-  // Sort icon component
-  const SortIcon = ({ field }) => {
-    if (sortField !== field) {
-      return (
-        <svg className="w-4 h-4 inline-block ml-1 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
-        </svg>
-      );
-    }
-    if (sortDirection === 'asc') {
-      return (
-        <svg className="w-4 h-4 inline-block ml-1 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-        </svg>
-      );
-    }
-    return (
-      <svg className="w-4 h-4 inline-block ml-1 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-      </svg>
-    );
-  };
 
   // Details component
   const InspectionDetails = ({ inspection }) => (
@@ -469,9 +345,9 @@ export default function ReportsPage() {
                 href={inspection.google_photos_link} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-800 underline break-all"
+                className="underline hover:text-green-900"
               >
-                {inspection.google_photos_link}
+                View Photos
               </a>
             </p>
           </div>
@@ -741,138 +617,6 @@ export default function ReportsPage() {
     </div>
   );
 
-  // Gate Check Details component
-  const GateCheckDetails = ({ gateCheck }) => (
-    <div className="p-4 md:p-6 space-y-6 bg-slate-50 border-t border-slate-200">
-      {/* Basic Info */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 p-3 md:p-4 bg-white rounded shadow-sm">
-        <div>
-          <p className="text-xs text-slate-500 uppercase font-semibold mb-1">Location</p>
-          {getBranchBadge(gateCheck.location)}
-        </div>
-        <div>
-          <p className="text-xs text-slate-500 uppercase font-semibold mb-1">Division</p>
-          <p className="text-xs md:text-sm text-slate-800 font-medium break-words">{getDepartmentDisplay(gateCheck.division)}</p>
-        </div>
-        <div>
-          <p className="text-xs text-slate-500 uppercase font-semibold mb-1">Crew Number</p>
-          <p className="text-xs md:text-sm text-slate-800 font-medium break-words">{gateCheck.crew_number}</p>
-        </div>
-        <div>
-          <p className="text-xs text-slate-500 uppercase font-semibold mb-1">Driver</p>
-          <p className="text-xs md:text-sm text-slate-800 font-medium break-words">{gateCheck.driver_name}</p>
-        </div>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 p-3 md:p-4 bg-white rounded shadow-sm">
-        <div>
-          <p className="text-xs text-slate-500 uppercase font-semibold mb-1">Inspector</p>
-          <p className="text-xs md:text-sm text-slate-800 font-medium break-words">{gateCheck.inspected_by}</p>
-        </div>
-        <div>
-          <p className="text-xs text-slate-500 uppercase font-semibold mb-1">Email</p>
-          <p className="text-xs md:text-sm text-slate-800 font-medium break-words">{gateCheck.email}</p>
-        </div>
-      </div>
-
-      {/* PPE Check */}
-      <div>
-        <h3 className="text-base md:text-lg font-semibold text-slate-800 mb-3 border-b-2 border-blue-600 pb-2">PPE Verification</h3>
-        <div className="grid grid-cols-1 gap-3 md:gap-4">
-          <div>
-            <p className="text-xs md:text-sm text-slate-600 mb-1">All Employees Have PPE</p>
-            {getStatusBadge(gateCheck.all_employees_have_ppe)}
-          </div>
-        </div>
-      </div>
-
-      {/* Vehicle Condition */}
-      <div>
-        <h3 className="text-base md:text-lg font-semibold text-slate-800 mb-3 border-b-2 border-blue-600 pb-2">Vehicle Condition</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-          <div>
-            <p className="text-xs md:text-sm text-slate-600 mb-1">Lights Working</p>
-            {getStatusBadge(gateCheck.lights_working)}
-          </div>
-          <div>
-            <p className="text-xs md:text-sm text-slate-600 mb-1">Mirrors Intact</p>
-            {getStatusBadge(gateCheck.mirrors_intact)}
-          </div>
-          <div>
-            <p className="text-xs md:text-sm text-slate-600 mb-1">License Plate Visible</p>
-            {getStatusBadge(gateCheck.license_plate_visible)}
-          </div>
-          <div>
-            <p className="text-xs md:text-sm text-slate-600 mb-1">Registration/Insurance Card</p>
-            {getStatusBadge(gateCheck.registration_insurance_card)}
-          </div>
-        </div>
-      </div>
-
-      {/* Trailer and Equipment */}
-      <div>
-        <h3 className="text-base md:text-lg font-semibold text-slate-800 mb-3 border-b-2 border-blue-600 pb-2">Trailer and Equipment</h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
-          <div>
-            <p className="text-xs md:text-sm text-slate-600 mb-1">Load Secured</p>
-            {getStatusBadge(gateCheck.load_secured)}
-          </div>
-          <div>
-            <p className="text-xs md:text-sm text-slate-600 mb-1">Trimmer Racks Locked</p>
-            {getStatusBadge(gateCheck.trimmer_racks_locked)}
-          </div>
-          <div>
-            <p className="text-xs md:text-sm text-slate-600 mb-1">Safety Pins in Place</p>
-            {getStatusBadge(gateCheck.safety_pins_in_place)}
-          </div>
-          <div>
-            <p className="text-xs md:text-sm text-slate-600 mb-1">Tires Inflated</p>
-            {getStatusBadge(gateCheck.tires_inflated)}
-          </div>
-          <div>
-            <p className="text-xs md:text-sm text-slate-600 mb-1">Spare Tire Available</p>
-            {getStatusBadge(gateCheck.spare_tire_available)}
-          </div>
-          <div>
-            <p className="text-xs md:text-sm text-slate-600 mb-1">Chemical Labeled & Secured</p>
-            {getStatusBadge(gateCheck.chemical_labeled_secured)}
-          </div>
-        </div>
-      </div>
-
-      {/* Safety Equipment */}
-      <div>
-        <h3 className="text-base md:text-lg font-semibold text-slate-800 mb-3 border-b-2 border-blue-600 pb-2">Safety Equipment</h3>
-        <div className="grid grid-cols-2 gap-3 md:gap-4">
-          <div>
-            <p className="text-xs md:text-sm text-slate-600 mb-1">5 Safety Cones</p>
-            {getStatusBadge(gateCheck.five_safety_cones)}
-          </div>
-          <div>
-            <p className="text-xs md:text-sm text-slate-600 mb-1">First Aid Kit / Fire Extinguisher</p>
-            {getStatusBadge(gateCheck.first_aid_kit_fire_extinguisher)}
-          </div>
-        </div>
-      </div>
-
-      {/* Additional Items */}
-      {gateCheck.additional_items && (
-        <div>
-          <h3 className="text-base md:text-lg font-semibold text-slate-800 mb-3 border-b-2 border-blue-600 pb-2">Additional Suggestions</h3>
-          <div className="p-3 bg-yellow-50 rounded">
-            <p className="text-xs md:text-sm text-slate-700">{gateCheck.additional_items}</p>
-          </div>
-        </div>
-      )}
-
-      {/* Metadata */}
-      <div className="pt-4 border-t border-slate-200">
-        <p className="text-xs text-slate-500 break-all">
-          Report ID: {gateCheck.id} • Created: {formatDateTime(gateCheck.created_at)}
-        </p>
-      </div>
-    </div>
-  );
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
@@ -912,18 +656,12 @@ export default function ReportsPage() {
           subtitle="View inspection reports and gate-checks"
           icon={FileText}
           actions={[
-            activeView === 'inspections' ? {
+            {
               label: 'New Inspection',
               href: '/',
               icon: Plus,
               variant: 'primary',
               ariaLabel: 'Create a new inspection',
-            } : {
-              label: 'New Gate Check',
-              href: '/gatechecks',
-              icon: Plus,
-              variant: 'primary',
-              ariaLabel: 'Create a new gate check',
             },
           ]}
         />
@@ -942,7 +680,7 @@ export default function ReportsPage() {
               >
                 <span className="flex items-center gap-2">
                   <FileText className="w-4 h-4" />
-                  Crew Inspections
+                  Inspection Reports
                 </span>
               </button>
               <button
@@ -1047,170 +785,13 @@ export default function ReportsPage() {
               </div>
             </>
           ) : (
-            <>
-              {/* Gate-Check Filters */}
-              <div className="flex flex-col gap-3 mb-4 md:mb-6">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-semibold text-slate-800">
-                    {filteredGateChecks.length} {filteredGateChecks.length === 1 ? 'gate check' : 'gate checks'} found
-                  </h3>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                  <input
-                    type="text"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Search by Inspector, Driver, Division, or Crew..."
-                    className="w-full px-3 py-2 text-sm md:text-base border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                  <select
-                    value={filterBranch}
-                    onChange={(e) => setFilterBranch(e.target.value)}
-                    className="w-full px-3 py-2 text-sm md:text-base border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="all">All Locations</option>
-                    <option value="phx-southwest">Phx - SouthWest</option>
-                    <option value="phx-southeast">Phx - SouthEast</option>
-                    <option value="phx-north">Phx - North</option>
-                    <option value="las-vegas">Las Vegas</option>
-                  </select>
-                  <select
-                    value={filterDepartment}
-                    onChange={(e) => setFilterDepartment(e.target.value)}
-                    className="w-full px-3 py-2 text-sm md:text-base border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="all">All Divisions</option>
-                    {uniqueGateCheckDivisions.sort().map((div) => (
-                      <option key={div} value={div}>
-                        {getDepartmentDisplay(div)}
-                      </option>
-                    ))}
-                  </select>
-                  <select
-                    value={filterCrew}
-                    onChange={(e) => setFilterCrew(e.target.value)}
-                    className="w-full px-3 py-2 text-sm md:text-base border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="all">All Crews</option>
-                    {uniqueGateCheckCrews.sort().map((crew) => (
-                      <option key={crew} value={crew}>
-                        {crew}
-                      </option>
-                    ))}
-                  </select>
-                  <select
-                    value={filterInspector}
-                    onChange={(e) => setFilterInspector(e.target.value)}
-                    className="w-full px-3 py-2 text-sm md:text-base border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="all">All Inspectors</option>
-                    {uniqueGateCheckInspectors.sort().map((inspector) => (
-                      <option key={inspector} value={inspector}>
-                        {inspector}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </>
+            <div className="text-center py-12">
+              <ClipboardCheck className="w-16 h-16 mx-auto text-slate-300 mb-4" />
+              <h3 className="text-xl font-semibold text-slate-700 mb-2">Gate-checks Coming Soon</h3>
+              <p className="text-slate-500">This feature is under development.</p>
+            </div>
           )}
         </div>
-
-        {/* Display Gate Checks */}
-        {activeView === 'gatechecks' && (
-          <>
-            {/* No Results */}
-            {filteredGateChecks.length === 0 ? (
-              <div className="bg-white rounded-lg shadow-lg p-8 md:p-12 text-center">
-                <p className="text-slate-500 text-base md:text-lg">No gate checks found.</p>
-                <Link
-                  href="/gatechecks"
-                  className="mt-4 inline-block px-4 md:px-6 py-2 md:py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 text-sm md:text-base"
-                >
-                  Create First Gate Check
-                </Link>
-              </div>
-            ) : (
-              <>
-                {/* Mobile Card View (shown on screens < 768px) */}
-                <div className="md:hidden space-y-3">
-                  {filteredGateChecks.map((gateCheck) => (
-                    <div key={gateCheck.id} className="bg-white rounded-lg shadow overflow-hidden">
-                      <div
-                        className="p-4 flex items-center gap-3 cursor-pointer active:bg-slate-50 transition-colors"
-                        onClick={() => toggleGateCheck(gateCheck.id)}
-                      >
-                        <button className="text-slate-600 flex-shrink-0">
-                          <ChevronIcon isExpanded={expandedGateCheckId === gateCheck.id} />
-                        </button>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex justify-between items-start mb-2">
-                            <div className="flex-1 min-w-0">
-                              <p className="font-semibold text-slate-800 text-sm truncate">{gateCheck.driver_name}</p>
-                              <p className="text-xs text-slate-600 mt-1">{formatDate(gateCheck.inspection_date)}</p>
-                            </div>
-                          </div>
-                          <div className="flex flex-wrap gap-2 mt-2">
-                            {getBranchBadge(gateCheck.location)}
-                            <span className="px-2 py-1 text-xs bg-slate-100 text-slate-700 rounded">{gateCheck.crew_number}</span>
-                          </div>
-                        </div>
-                      </div>
-                      {expandedGateCheckId === gateCheck.id && <GateCheckDetails gateCheck={gateCheck} />}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Desktop Table View (shown on screens >= 768px) */}
-                <div className="hidden md:block bg-white rounded-lg shadow-lg overflow-hidden">
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead className="bg-slate-100 border-b-2 border-blue-600">
-                        <tr>
-                          <th className="px-4 py-3 text-center text-xs font-semibold text-slate-700 uppercase w-12"></th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Date</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Driver</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Location</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Division</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Crew #</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Inspector</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {filteredGateChecks.map((gateCheck) => [
-                          <tr 
-                            key={gateCheck.id}
-                            className="hover:bg-slate-50 transition-colors cursor-pointer border-b border-slate-200"
-                            onClick={() => toggleGateCheck(gateCheck.id)}
-                          >
-                            <td className="px-4 py-3 text-center">
-                              <button className="text-slate-600 hover:text-slate-800 transition-colors">
-                                <ChevronIcon isExpanded={expandedGateCheckId === gateCheck.id} />
-                              </button>
-                            </td>
-                            <td className="px-4 py-3 text-sm text-slate-700">{formatDate(gateCheck.inspection_date)}</td>
-                            <td className="px-4 py-3 text-sm text-slate-700">{gateCheck.driver_name}</td>
-                            <td className="px-4 py-3">{getBranchBadge(gateCheck.location)}</td>
-                            <td className="px-4 py-3 text-sm text-slate-700">{getDepartmentDisplay(gateCheck.division)}</td>
-                            <td className="px-4 py-3 text-sm text-slate-700">{gateCheck.crew_number}</td>
-                            <td className="px-4 py-3 text-sm text-slate-700">{gateCheck.inspected_by}</td>
-                          </tr>,
-                          expandedGateCheckId === gateCheck.id && (
-                            <tr key={`${gateCheck.id}-details`}>
-                              <td colSpan="7" className="p-0">
-                                <GateCheckDetails gateCheck={gateCheck} />
-                              </td>
-                            </tr>
-                          )
-                        ])}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </>
-            )}
-          </>
-        )}
 
         {/* Display Inspection Reports */}
         {activeView === 'inspections' && (
@@ -1245,11 +826,8 @@ export default function ReportsPage() {
                               <p className="font-semibold text-slate-800 text-sm truncate">{inspection.inspected_by}</p>
                               <p className="text-xs text-slate-600 mt-1">{formatDate(inspection.inspection_date)}</p>
                             </div>
-                            <div className="ml-2 flex-shrink-0 flex items-center gap-2">
+                            <div className="ml-2 flex-shrink-0">
                               {getSafetyBadge(inspection.safety_issue_asap)}
-                              {inspection.google_photos_link && (
-                                <span className="text-base" title="Photos available">📸</span>
-                              )}
                             </div>
                           </div>
                           <div className="flex flex-wrap gap-2 mt-2">
@@ -1270,42 +848,12 @@ export default function ReportsPage() {
                       <thead className="bg-slate-100 border-b-2 border-blue-600">
                         <tr>
                           <th className="px-4 py-3 text-center text-xs font-semibold text-slate-700 uppercase w-12"></th>
-                          <th 
-                            className="px-4 py-3 text-left text-xs font-semibold text-slate-700 uppercase cursor-pointer hover:bg-slate-200 transition-colors"
-                            onClick={() => handleSort('inspection_date')}
-                          >
-                            Date <SortIcon field="inspection_date" />
-                          </th>
-                          <th 
-                            className="px-4 py-3 text-left text-xs font-semibold text-slate-700 uppercase cursor-pointer hover:bg-slate-200 transition-colors"
-                            onClick={() => handleSort('inspected_by')}
-                          >
-                            Inspector <SortIcon field="inspected_by" />
-                          </th>
-                          <th 
-                            className="px-4 py-3 text-left text-xs font-semibold text-slate-700 uppercase cursor-pointer hover:bg-slate-200 transition-colors"
-                            onClick={() => handleSort('crew_branch')}
-                          >
-                            Branch <SortIcon field="crew_branch" />
-                          </th>
-                          <th 
-                            className="px-4 py-3 text-left text-xs font-semibold text-slate-700 uppercase cursor-pointer hover:bg-slate-200 transition-colors"
-                            onClick={() => handleSort('department')}
-                          >
-                            Department <SortIcon field="department" />
-                          </th>
-                          <th 
-                            className="px-4 py-3 text-left text-xs font-semibold text-slate-700 uppercase cursor-pointer hover:bg-slate-200 transition-colors"
-                            onClick={() => handleSort('crew_observed')}
-                          >
-                            Crew <SortIcon field="crew_observed" />
-                          </th>
-                          <th 
-                            className="px-4 py-3 text-center text-xs font-semibold text-slate-700 uppercase cursor-pointer hover:bg-slate-200 transition-colors"
-                            onClick={() => handleSort('safety_issue_asap')}
-                          >
-                            Safety Alert <SortIcon field="safety_issue_asap" />
-                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Date</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Inspector</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Branch</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Department</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Crew</th>
+                          <th className="px-4 py-3 text-center text-xs font-semibold text-slate-700 uppercase">Safety Alert</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1325,12 +873,7 @@ export default function ReportsPage() {
                             <td className="px-4 py-3">{getBranchBadge(inspection.crew_branch)}</td>
                             <td className="px-4 py-3 text-sm text-slate-700">{getDepartmentDisplay(inspection.department)}</td>
                             <td className="px-4 py-3 text-sm text-slate-700">{inspection.crew_observed}</td>
-                            <td className="px-4 py-3 text-center">
-                              {getSafetyBadge(inspection.safety_issue_asap)}
-                              {inspection.google_photos_link && (
-                                <span className="text-base ml-2" title="Photos available">📸</span>
-                              )}
-                            </td>
+                            <td className="px-4 py-3 text-center">{getSafetyBadge(inspection.safety_issue_asap)}</td>
                           </tr>,
                           expandedInspectionId === inspection.id && (
                             <tr key={`${inspection.id}-details`}>
