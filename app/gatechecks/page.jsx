@@ -334,22 +334,22 @@ export default function GateCheckForm() {
               </h2>
               
               <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
-                <table className="border-collapse border border-slate-300 min-w-[600px] table-auto">
+                <table className="border-collapse border border-slate-300 min-w-[500px] table-auto">
                   <thead>
                     <tr className="bg-slate-100">
                       <th className="border border-slate-300 px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold text-slate-700">
                         Item
                       </th>
-                      <th className="border border-slate-300 px-2 md:px-3 py-2 text-center text-xs md:text-sm font-semibold text-slate-700 w-16 md:w-20">
+                      <th className="border border-slate-300 px-2 md:px-3 py-2 text-center text-xs md:text-sm font-semibold text-slate-700 w-14 md:w-20">
                         Yes
                       </th>
-                      <th className="border border-slate-300 px-2 md:px-3 py-2 text-center text-xs md:text-sm font-semibold text-slate-700 w-16 md:w-20">
+                      <th className="border border-slate-300 px-2 md:px-3 py-2 text-center text-xs md:text-sm font-semibold text-slate-700 w-14 md:w-20">
                         No
                       </th>
                       <th className="border border-slate-300 px-2 md:px-3 py-2 text-center text-xs md:text-sm font-semibold text-slate-700 w-20 md:w-24">
                         Needs Service
                       </th>
-                      <th className="border border-slate-300 px-2 md:px-3 py-2 text-center text-xs md:text-sm font-semibold text-slate-700 w-16 md:w-20">
+                      <th className="border border-slate-300 px-2 md:px-3 py-2 text-center text-xs md:text-sm font-semibold text-slate-700 w-14 md:w-20">
                         N/A
                       </th>
                     </tr>
@@ -395,22 +395,22 @@ export default function GateCheckForm() {
               </h2>
               
               <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
-                <table className="border-collapse border border-slate-300 min-w-[600px] table-auto">
+                <table className="border-collapse border border-slate-300 min-w-[500px] table-auto">
                   <thead>
                     <tr className="bg-slate-100">
                       <th className="border border-slate-300 px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold text-slate-700">
                         Item
                       </th>
-                      <th className="border border-slate-300 px-2 md:px-3 py-2 text-center text-xs md:text-sm font-semibold text-slate-700 w-16 md:w-20">
+                      <th className="border border-slate-300 px-2 md:px-3 py-2 text-center text-xs md:text-sm font-semibold text-slate-700 w-14 md:w-20">
                         Yes
                       </th>
-                      <th className="border border-slate-300 px-2 md:px-3 py-2 text-center text-xs md:text-sm font-semibold text-slate-700 w-16 md:w-20">
+                      <th className="border border-slate-300 px-2 md:px-3 py-2 text-center text-xs md:text-sm font-semibold text-slate-700 w-14 md:w-20">
                         No
                       </th>
                       <th className="border border-slate-300 px-2 md:px-3 py-2 text-center text-xs md:text-sm font-semibold text-slate-700 w-20 md:w-24">
                         Needs Service
                       </th>
-                      <th className="border border-slate-300 px-2 md:px-3 py-2 text-center text-xs md:text-sm font-semibold text-slate-700 w-16 md:w-20">
+                      <th className="border border-slate-300 px-2 md:px-3 py-2 text-center text-xs md:text-sm font-semibold text-slate-700 w-14 md:w-20">
                         N/A
                       </th>
                     </tr>
