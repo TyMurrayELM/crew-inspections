@@ -1228,9 +1228,15 @@ export default function ReportsPage() {
                 {/* Mobile Card View (shown on screens < 768px) */}
                 <div className="md:hidden space-y-3">
                   {filteredInspections.map((inspection) => (
-                    <div key={inspection.id} className="bg-white rounded-lg shadow overflow-hidden">
+                    <div key={inspection.id} className={`rounded-lg shadow overflow-hidden ${
+                      inspection.safety_issue_asap === 'yes' ? 'bg-red-50' : 'bg-white'
+                    }`}>
                       <div
-                        className="p-4 flex items-center gap-3 cursor-pointer active:bg-slate-50 transition-colors"
+                        className={`p-4 flex items-center gap-3 cursor-pointer transition-colors ${
+                          inspection.safety_issue_asap === 'yes' 
+                            ? 'active:bg-red-100' 
+                            : 'active:bg-slate-50'
+                        }`}
                         onClick={() => toggleInspection(inspection.id)}
                       >
                         <button className="text-slate-600 flex-shrink-0">
@@ -1309,7 +1315,11 @@ export default function ReportsPage() {
                         {filteredInspections.map((inspection) => [
                           <tr 
                             key={inspection.id}
-                            className="hover:bg-slate-50 transition-colors cursor-pointer border-b border-slate-200"
+                            className={`transition-colors cursor-pointer border-b border-slate-200 ${
+                              inspection.safety_issue_asap === 'yes' 
+                                ? 'bg-red-50 hover:bg-red-100' 
+                                : 'hover:bg-slate-50'
+                            }`}
                             onClick={() => toggleInspection(inspection.id)}
                           >
                             <td className="px-4 py-3 text-center">
@@ -1323,10 +1333,12 @@ export default function ReportsPage() {
                             <td className="px-4 py-3 text-sm text-slate-700">{getDepartmentDisplay(inspection.department)}</td>
                             <td className="px-4 py-3 text-sm text-slate-700">{inspection.crew_observed}</td>
                             <td className="px-4 py-3 text-center">
-                              {getSafetyBadge(inspection.safety_issue_asap)}
-                              {inspection.google_photos_link && (
-                                <span className="text-base ml-2" title="Photos available">📸</span>
-                              )}
+                              <div className="flex items-center justify-center gap-2">
+                                {inspection.google_photos_link && (
+                                  <span className="text-base" title="Photos available">📸</span>
+                                )}
+                                {getSafetyBadge(inspection.safety_issue_asap)}
+                              </div>
                             </td>
                           </tr>,
                           expandedInspectionId === inspection.id && (
