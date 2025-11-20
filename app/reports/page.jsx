@@ -906,31 +906,17 @@ export default function ReportsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 py-4 md:py-8 px-4">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
+        {/* Header - No action buttons */}
         <Header
           title="Safety Reports"
           subtitle="View inspection reports and gate-checks"
           icon={FileText}
-          actions={[
-            activeView === 'inspections' ? {
-              label: 'New Inspection',
-              href: '/',
-              icon: Plus,
-              variant: 'primary',
-              ariaLabel: 'Create a new inspection',
-            } : {
-              label: 'New Gate Check',
-              href: '/gatechecks',
-              icon: Plus,
-              variant: 'primary',
-              ariaLabel: 'Create a new gate check',
-            },
-          ]}
         />
 
-        {/* View Toggle - iPhone-style segmented control */}
+        {/* View Toggle and New Button Container */}
         <div className="bg-white rounded-lg shadow-lg p-4 md:p-6 mb-4 md:mb-6">
-          <div className="flex justify-center mb-6">
+          {/* View Toggle - iPhone-style segmented control */}
+          <div className="flex justify-center mb-4">
             <div className="inline-flex rounded-lg bg-slate-200 p-1">
               <button
                 onClick={() => setActiveView('inspections')}
@@ -959,6 +945,17 @@ export default function ReportsPage() {
                 </span>
               </button>
             </div>
+          </div>
+
+          {/* New Button - Changes based on active view */}
+          <div className="flex justify-center mb-6">
+            <Link
+              href={activeView === 'inspections' ? '/' : '/gatechecks'}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+            >
+              <Plus className="w-5 h-5" />
+              {activeView === 'inspections' ? 'New Inspection' : 'New Gate Check'}
+            </Link>
           </div>
 
           {/* Content based on active view */}

@@ -14,7 +14,6 @@ const supabase = createClient(
 export default function GateCheckForm() {
   const [formData, setFormData] = useState({
     date: '',
-    email: '',
     location: '',
     division: '',
     crewNumber: '',
@@ -56,7 +55,6 @@ export default function GateCheckForm() {
         .insert([
           {
             inspection_date: formData.date,
-            email: formData.email,
             location: formData.location,
             division: formData.division,
             crew_number: formData.crewNumber,
@@ -137,22 +135,7 @@ export default function GateCheckForm() {
                     required
                   />
                 </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
-                    Email *
-                  </label>
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => handleInputChange('email', e.target.value)}
-                    className="w-full px-3 py-2 text-base border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    required
-                  />
-                </div>
-              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">
                     Location *
@@ -163,15 +146,15 @@ export default function GateCheckForm() {
                     className="w-full px-3 py-2 text-base border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     required
                   >
-                    <option value="">Select Location</option>
-                    <option value="phx-southwest">Phx - SouthWest</option>
-                    <option value="phx-southeast">Phx - SouthEast</option>
-                    <option value="phx-north">Phx - North</option>
-                    <option value="las-vegas">Las Vegas</option>
-                    <option value="corporate">Corporate</option>
+                    <option value="">Select location...</option>
+                    <option value="Corporate">Corporate</option>
+                    <option value="Phoenix - North">Phoenix - North</option>
+                    <option value="Phoenix - Southwest">Phoenix - Southwest</option>
+                    <option value="Phoenix - Southeast">Phoenix - Southeast</option>
+                    <option value="Las Vegas">Las Vegas</option>
                   </select>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">
                     Division *
@@ -182,22 +165,19 @@ export default function GateCheckForm() {
                     className="w-full px-3 py-2 text-base border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     required
                   >
-                    <option value="">Select Division</option>
-                    <option value="arbor">Arbor</option>
-                    <option value="enhancements">Enhancements</option>
-                    <option value="irrigation">Irrigation</option>
-                    <option value="maintenance">Maintenance</option>
-                    <option value="maintenance-onsite">Maintenance Onsite</option>
-                    <option value="overhead">Overhead</option>
-                    <option value="spray-phc">Spray / PHC</option>
+                    <option value="">Select division...</option>
+                    <option value="Maintenance">Maintenance</option>
+                    <option value="Enhancement">Enhancement</option>
+                    <option value="Construction">Construction</option>
+                    <option value="Admin">Admin</option>
+                    <option value="Operations">Operations</option>
+                    <option value="Snow">Snow</option>
                   </select>
                 </div>
-              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">
-                    Crew Number *
+                    Crew *
                   </label>
                   <input
                     type="text"
@@ -208,7 +188,7 @@ export default function GateCheckForm() {
                   />
                 </div>
                 
-                <div>
+                <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-slate-700 mb-1">
                     Driver Name *
                   </label>
@@ -234,83 +214,194 @@ export default function GateCheckForm() {
                   Do all employees have their PPE? *
                 </label>
                 <div className="flex flex-wrap gap-4">
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="allEmployeesHavePPE"
-                      value="yes"
-                      checked={formData.allEmployeesHavePPE === 'yes'}
-                      onChange={(e) => handleInputChange('allEmployeesHavePPE', e.target.value)}
-                      className="mr-2 w-4 h-4 text-blue-600 focus:ring-blue-500"
-                      required
-                    />
-                    <span className="text-sm md:text-base text-slate-700">Yes</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="allEmployeesHavePPE"
-                      value="no"
-                      checked={formData.allEmployeesHavePPE === 'no'}
-                      onChange={(e) => handleInputChange('allEmployeesHavePPE', e.target.value)}
-                      className="mr-2 w-4 h-4 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="text-sm md:text-base text-slate-700">No</span>
-                  </label>
+                  {['yes', 'no'].map((value) => (
+                    <label key={value} className="flex items-center">
+                      <input
+                        type="radio"
+                        name="allEmployeesHavePPE"
+                        value={value}
+                        checked={formData.allEmployeesHavePPE === value}
+                        onChange={(e) => handleInputChange('allEmployeesHavePPE', e.target.value)}
+                        className="mr-2 w-4 h-4 text-blue-600 focus:ring-blue-500"
+                        required
+                      />
+                      <span className="text-sm md:text-base text-slate-700 capitalize">
+                        {value.charAt(0).toUpperCase() + value.slice(1)}
+                      </span>
+                    </label>
+                  ))}
                 </div>
               </div>
             </section>
 
-            {/* Vehicle Condition */}
+            {/* Vehicle Condition - TABLE FORMAT */}
             <section className="space-y-4">
               <h2 className="text-lg md:text-xl font-semibold text-slate-800 border-b-2 border-blue-600 pb-2">
                 Vehicle Condition *
               </h2>
               
-              <div className="space-y-4">
-                {[
-                  { key: 'lightsWorking', label: 'Lights Working' },
-                  { key: 'mirrorsIntact', label: 'Mirrors Intact' },
-                  { key: 'licensePlateVisible', label: 'License Plate Visible' }
-                ].map(({ key, label }) => (
-                  <div key={key}>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      {label} *
-                    </label>
-                    <div className="flex flex-wrap gap-4">
-                      {['yes', 'no', 'needs-service'].map((value) => (
-                        <label key={value} className="flex items-center">
-                          <input
-                            type="radio"
-                            name={key}
-                            value={value}
-                            checked={formData[key] === value}
-                            onChange={(e) => handleInputChange(key, e.target.value)}
-                            className="mr-2 w-4 h-4 text-blue-600 focus:ring-blue-500"
-                            required
-                          />
-                          <span className="text-sm md:text-base text-slate-700 capitalize">
-                            {value === 'needs-service' ? 'Needs Service' : value.charAt(0).toUpperCase() + value.slice(1)}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+              <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+                <table className="w-full border-collapse border border-slate-300 min-w-[600px]">
+                  <thead>
+                    <tr className="bg-slate-100">
+                      <th className="border border-slate-300 px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold text-slate-700 min-w-[140px]">
+                        Item
+                      </th>
+                      <th className="border border-slate-300 px-2 md:px-3 py-2 text-center text-xs md:text-sm font-semibold text-slate-700 w-16 md:w-20">
+                        Yes
+                      </th>
+                      <th className="border border-slate-300 px-2 md:px-3 py-2 text-center text-xs md:text-sm font-semibold text-slate-700 w-16 md:w-20">
+                        No
+                      </th>
+                      <th className="border border-slate-300 px-2 md:px-3 py-2 text-center text-xs md:text-sm font-semibold text-slate-700 w-20 md:w-24">
+                        Needs Service
+                      </th>
+                      <th className="border border-slate-300 px-2 md:px-3 py-2 text-center text-xs md:text-sm font-semibold text-slate-700 w-16 md:w-20">
+                        N/A
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { key: 'lightsWorking', label: 'Lights Working' },
+                      { key: 'mirrorsIntact', label: 'Mirrors Intact' },
+                      { key: 'licensePlateVisible', label: 'License Plate Visible' },
+                      { key: 'registrationInsuranceCard', label: 'Registration / Insurance Card' }
+                    ].map((item, index) => (
+                      <tr key={item.key} className={index % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
+                        <td className="border border-slate-300 px-2 md:px-3 py-3 text-xs md:text-sm text-slate-700 font-medium">
+                          {item.label}
+                        </td>
+                        {['yes', 'no', 'needs service', 'na'].map((value) => (
+                          <td key={value} className="border border-slate-300 px-2 md:px-3 py-3 text-center">
+                            <label className="flex items-center justify-center cursor-pointer">
+                              <input
+                                type="radio"
+                                name={item.key}
+                                value={value}
+                                checked={formData[item.key] === value}
+                                onChange={(e) => handleInputChange(item.key, e.target.value)}
+                                className="w-5 h-5 md:w-4 md:h-4 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                                required
+                              />
+                            </label>
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p className="text-xs text-slate-500 italic md:hidden">← Scroll horizontally to see all options →</p>
+            </section>
 
+            {/* Trailer and Equipment - TABLE FORMAT */}
+            <section className="space-y-4">
+              <h2 className="text-lg md:text-xl font-semibold text-slate-800 border-b-2 border-blue-600 pb-2">
+                Trailer and Equipment *
+              </h2>
+              
+              <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+                <table className="w-full border-collapse border border-slate-300 min-w-[600px]">
+                  <thead>
+                    <tr className="bg-slate-100">
+                      <th className="border border-slate-300 px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold text-slate-700 min-w-[140px]">
+                        Item
+                      </th>
+                      <th className="border border-slate-300 px-2 md:px-3 py-2 text-center text-xs md:text-sm font-semibold text-slate-700 w-16 md:w-20">
+                        Yes
+                      </th>
+                      <th className="border border-slate-300 px-2 md:px-3 py-2 text-center text-xs md:text-sm font-semibold text-slate-700 w-16 md:w-20">
+                        No
+                      </th>
+                      <th className="border border-slate-300 px-2 md:px-3 py-2 text-center text-xs md:text-sm font-semibold text-slate-700 w-20 md:w-24">
+                        Needs Service
+                      </th>
+                      <th className="border border-slate-300 px-2 md:px-3 py-2 text-center text-xs md:text-sm font-semibold text-slate-700 w-16 md:w-20">
+                        N/A
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { key: 'loadSecured', label: 'Load Secured' },
+                      { key: 'trimmerRacksLocked', label: 'Trimmer Racks Locked' },
+                      { key: 'safetyPinsInPlace', label: 'Safety Pins in Place' },
+                      { key: 'tiresInflated', label: 'Tires Inflated' },
+                      { key: 'spareTireAvailable', label: 'Spare Tire Available' },
+                      { key: 'chemicalLabeledSecured', label: 'Chemical Labeled & Secured' }
+                    ].map((item, index) => (
+                      <tr key={item.key} className={index % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
+                        <td className="border border-slate-300 px-2 md:px-3 py-3 text-xs md:text-sm text-slate-700 font-medium">
+                          {item.label}
+                        </td>
+                        {['yes', 'no', 'needs service', 'na'].map((value) => (
+                          <td key={value} className="border border-slate-300 px-2 md:px-3 py-3 text-center">
+                            <label className="flex items-center justify-center cursor-pointer">
+                              <input
+                                type="radio"
+                                name={item.key}
+                                value={value}
+                                checked={formData[item.key] === value}
+                                onChange={(e) => handleInputChange(item.key, e.target.value)}
+                                className="w-5 h-5 md:w-4 md:h-4 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                                required
+                              />
+                            </label>
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p className="text-xs text-slate-500 italic md:hidden">← Scroll horizontally to see all options →</p>
+            </section>
+
+            {/* Safety Equipment */}
+            <section className="space-y-4">
+              <h2 className="text-lg md:text-xl font-semibold text-slate-800 border-b-2 border-blue-600 pb-2">
+                Safety Equipment
+              </h2>
+              
+              <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Registration / Insurance Card *
+                    5 Safety Cones *
                   </label>
                   <div className="flex flex-wrap gap-4">
                     {['yes', 'no'].map((value) => (
                       <label key={value} className="flex items-center">
                         <input
                           type="radio"
-                          name="registrationInsuranceCard"
+                          name="fiveSafetyCones"
                           value={value}
-                          checked={formData.registrationInsuranceCard === value}
-                          onChange={(e) => handleInputChange('registrationInsuranceCard', e.target.value)}
+                          checked={formData.fiveSafetyCones === value}
+                          onChange={(e) => handleInputChange('fiveSafetyCones', e.target.value)}
+                          className="mr-2 w-4 h-4 text-blue-600 focus:ring-blue-500"
+                          required
+                        />
+                        <span className="text-sm md:text-base text-slate-700 capitalize">
+                          {value.charAt(0).toUpperCase() + value.slice(1)}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    First Aid Kit / Fire Extinguisher *
+                  </label>
+                  <div className="flex flex-wrap gap-4">
+                    {['yes', 'no'].map((value) => (
+                      <label key={value} className="flex items-center">
+                        <input
+                          type="radio"
+                          name="firstAidKitFireExtinguisher"
+                          value={value}
+                          checked={formData.firstAidKitFireExtinguisher === value}
+                          onChange={(e) => handleInputChange('firstAidKitFireExtinguisher', e.target.value)}
                           className="mr-2 w-4 h-4 text-blue-600 focus:ring-blue-500"
                           required
                         />
@@ -324,94 +415,15 @@ export default function GateCheckForm() {
               </div>
             </section>
 
-            {/* Trailer and Equipment */}
+            {/* Inspector Info and Additional Items */}
             <section className="space-y-4">
               <h2 className="text-lg md:text-xl font-semibold text-slate-800 border-b-2 border-blue-600 pb-2">
-                Trailer and Equipment *
-              </h2>
-              
-              <div className="space-y-4">
-                {[
-                  { key: 'loadSecured', label: 'Load Secured' },
-                  { key: 'trimmerRacksLocked', label: 'Trimmer Racks Locked' },
-                  { key: 'safetyPinsInPlace', label: 'Safety Pins in Place' },
-                  { key: 'tiresInflated', label: 'Tires Inflated' },
-                  { key: 'spareTireAvailable', label: 'Spare Tire Available' },
-                  { key: 'chemicalLabeledSecured', label: 'Chemical Labeled and Secured' }
-                ].map(({ key, label }) => (
-                  <div key={key}>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      {label} *
-                    </label>
-                    <div className="flex flex-wrap gap-4">
-                      {['yes', 'no', 'needs-service', 'na'].map((value) => (
-                        <label key={value} className="flex items-center">
-                          <input
-                            type="radio"
-                            name={key}
-                            value={value}
-                            checked={formData[key] === value}
-                            onChange={(e) => handleInputChange(key, e.target.value)}
-                            className="mr-2 w-4 h-4 text-blue-600 focus:ring-blue-500"
-                            required
-                          />
-                          <span className="text-sm md:text-base text-slate-700 capitalize">
-                            {value === 'needs-service' ? 'Needs Service' : value === 'na' ? 'N/A' : value.charAt(0).toUpperCase() + value.slice(1)}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            {/* Safety Equipment */}
-            <section className="space-y-4">
-              <h2 className="text-lg md:text-xl font-semibold text-slate-800 border-b-2 border-blue-600 pb-2">
-                Safety Equipment
-              </h2>
-              
-              <div className="space-y-4">
-                {[
-                  { key: 'fiveSafetyCones', label: '5 Safety Cones' },
-                  { key: 'firstAidKitFireExtinguisher', label: 'First Aid Kit / Fire Extinguisher' }
-                ].map(({ key, label }) => (
-                  <div key={key}>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      {label}
-                    </label>
-                    <div className="flex flex-wrap gap-4">
-                      {['yes', 'no'].map((value) => (
-                        <label key={value} className="flex items-center">
-                          <input
-                            type="radio"
-                            name={key}
-                            value={value}
-                            checked={formData[key] === value}
-                            onChange={(e) => handleInputChange(key, e.target.value)}
-                            className="mr-2 w-4 h-4 text-blue-600 focus:ring-blue-500"
-                          />
-                          <span className="text-sm md:text-base text-slate-700 capitalize">
-                            {value.charAt(0).toUpperCase() + value.slice(1)}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            {/* Inspector and Additional Items */}
-            <section className="space-y-4">
-              <h2 className="text-lg md:text-xl font-semibold text-slate-800 border-b-2 border-blue-600 pb-2">
-                Additional Information
+                Inspector Information
               </h2>
               
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Inspected By: *
+                  Inspected By *
                 </label>
                 <input
                   type="text"
@@ -424,7 +436,7 @@ export default function GateCheckForm() {
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Are there any additional items you believe should be included in future gate check inspections?
+                  Additional Items / Suggestions for Future Gate Checks
                 </label>
                 <textarea
                   value={formData.additionalItems}
