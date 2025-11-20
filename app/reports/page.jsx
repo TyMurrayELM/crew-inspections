@@ -908,13 +908,12 @@ export default function ReportsPage() {
       <div className="max-w-7xl mx-auto">
         {/* Header - No action buttons */}
         <Header
-          title="Safety Reports"
-          subtitle="View inspection reports and gate-checks"
+          title="Safety & Facilities Reports"
           icon={FileText}
         />
 
         {/* View Toggle and New Button Container */}
-        <div className="bg-white rounded-lg shadow-lg p-4 md:p-6 mb-4 md:mb-6">
+        <div className="bg-white rounded-lg shadow-lg p-4 md:p-6 mb-6 md:mb-8">
           {/* View Toggle - iPhone-style segmented control */}
           <div className="flex justify-center mb-4">
             <div className="inline-flex rounded-lg bg-slate-200 p-1">
@@ -948,7 +947,7 @@ export default function ReportsPage() {
           </div>
 
           {/* New Button - Changes based on active view */}
-          <div className="flex justify-center mb-6">
+          <div className="flex justify-center">
             <Link
               href={activeView === 'inspections' ? '/' : '/gatechecks'}
               className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
@@ -957,12 +956,13 @@ export default function ReportsPage() {
               {activeView === 'inspections' ? 'New Inspection' : 'New Gate Check'}
             </Link>
           </div>
+        </div>
 
-          {/* Content based on active view */}
-          {activeView === 'inspections' ? (
+        {/* Filters Section - Separate Card */}
+        <div className="bg-white rounded-lg shadow-lg p-4 md:p-6 mb-4 md:mb-6 border-t-4 border-blue-600">{activeView === 'inspections' ? (
             <>
-              {/* Filters */}
-              <div className="flex flex-col gap-3 mb-4 md:mb-6">
+              {/* Inspection Filters */}
+              <div className="flex flex-col gap-3">
                 <div className="flex justify-between items-center">
                   <h3 className="text-lg font-semibold text-slate-800">
                     {filteredInspections.length} {filteredInspections.length === 1 ? 'report' : 'reports'} found
@@ -1046,7 +1046,7 @@ export default function ReportsPage() {
           ) : (
             <>
               {/* Gate-Check Filters */}
-              <div className="flex flex-col gap-3 mb-4 md:mb-6">
+              <div className="flex flex-col gap-3">
                 <div className="flex justify-between items-center">
                   <h3 className="text-lg font-semibold text-slate-800">
                     {filteredGateChecks.length} {filteredGateChecks.length === 1 ? 'gate check' : 'gate checks'} found
