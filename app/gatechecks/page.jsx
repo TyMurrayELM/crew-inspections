@@ -12,6 +12,80 @@ const supabase = createClient(
 );
 
 export default function GateCheckForm() {
+  // Crew data organized by branch (same as crew inspection form)
+  const crewsByBranch = {
+    'Las Vegas': [
+      'LV_ARBOR_Team 1',
+      'LV_ENHAN_Team 1',
+      'LV_ENHAN_Team 2',
+      'LV_IRR_Tech 1',
+      'LV_IRR_Tech 2',
+      'LV_IRR_Tech 3',
+      'LV_MAINT_Onsite Cheyenne Corp',
+      'LV_MAINT_Onsite Rainbow Creek HOA',
+      'LV_MAINT_Onsite Spectrum',
+      'LV_MAINT_Onsite_GoldenTriangle',
+      'LV_MAINT_Onsite_Speedway',
+      'LV_MAINT_Team 1',
+      'LV_MAINT_Team 2',
+      'LV_MAINT_Team 3',
+      'LV_MAINT_Team 4',
+      'LV_MAINT_Team 5',
+      'LV_SPRAY'
+    ],
+    'Phoenix - North': [
+      'PHX_N_IRR_Tech 1',
+      'PHX_N_IRR_Tech 2',
+      'PHX_N_MAINT_Onsite Venu at Grayhawk',
+      'PHX_N_MAINT_Team 1',
+      'PHX_N_MAINT_Team 2',
+      'PHX_N_MAINT_Team 3',
+      'PHX_N_MAINT_Team 4',
+      'PHX_N_MAINT_Team 5',
+      'PHX_N_MAINT_Team 6'
+    ],
+    'Phoenix - Southeast': [
+      'PHX_SE_IRR_Tech 1',
+      'PHX_SE_IRR_Tech 2',
+      'PHX_SE_IRR_Tech 3',
+      'PHX_SE_MAINT_Onsite Portales',
+      'PHX_SE_MAINT_Onsite Spectrum Falls',
+      'PHX_SE_MAINT_Onsite Waypoint',
+      'PHX_SE_MAINT_Team 1',
+      'PHX_SE_MAINT_Team 2',
+      'PHX_SE_MAINT_Team 3',
+      'PHX_SE_MAINT_Team 4',
+      'PHX_SE_MAINT_Team 5',
+      'PHX_SE_MAINT_Team 6',
+      'PHX_SE_MAINT_Team 7'
+    ],
+    'Phoenix - Southwest': [
+      'PHX_SW_ARBOR_Team 1',
+      'PHX_SW_ENHAN_Team 1',
+      'PHX_SW_ENHAN_Team 2',
+      'PHX_SW_IRR_Tech 1',
+      'PHX_SW_IRR_Tech 2',
+      'PHX_SW_IRR_Tech 3',
+      'PHX_SW_IRR_Tech 4',
+      'PHX_SW_IRR_Tech 5',
+      'PHX_SW_MAINT_Onsite Trilogy Encanterra',
+      'PHX_SW_MAINT_Team 1',
+      'PHX_SW_MAINT_Team 2',
+      'PHX_SW_MAINT_Team 3',
+      'PHX_SW_MAINT_Team 4',
+      'PHX_SW_MAINT_Team 5',
+      'PHX_SW_MAINT_Team 6',
+      'PHX_SW_MAINT_Team 7',
+      'PHX_SW_MAINT_Team 8'
+    ],
+    'Corporate': [
+      'PHX_OVERHEAD_Landscape Supervisor',
+      'PHX_OVERHEAD_Irrigation Supervisor',
+      'PHX_OVERHEAD_Safety',
+      'PHX_OVERHEAD_Account Manager/BDM'
+    ]
+  };
+
   const [formData, setFormData] = useState({
     date: '',
     location: '',
@@ -44,6 +118,19 @@ export default function GateCheckForm() {
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  // Get available crews - show all crews from all locations
+  const getAvailableCrews = () => {
+    const allCrews = [
+      ...crewsByBranch['Las Vegas'],
+      ...crewsByBranch['Phoenix - North'],
+      ...crewsByBranch['Phoenix - Southeast'],
+      ...crewsByBranch['Phoenix - Southwest'],
+      ...crewsByBranch['Corporate']
+    ];
+    
+    return allCrews.sort();
   };
 
   const handleSubmit = async (e) => {
@@ -179,13 +266,19 @@ export default function GateCheckForm() {
                   <label className="block text-sm font-medium text-slate-700 mb-1">
                     Crew *
                   </label>
-                  <input
-                    type="text"
+                  <select
                     value={formData.crewNumber}
                     onChange={(e) => handleInputChange('crewNumber', e.target.value)}
                     className="w-full px-3 py-2 text-base border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     required
-                  />
+                  >
+                    <option value="">Select Crew...</option>
+                    {getAvailableCrews().map((crew) => (
+                      <option key={crew} value={crew}>
+                        {crew}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 
                 <div className="md:col-span-2">
@@ -241,10 +334,10 @@ export default function GateCheckForm() {
               </h2>
               
               <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
-                <table className="w-full border-collapse border border-slate-300 min-w-[600px]">
+                <table className="border-collapse border border-slate-300 min-w-[600px] table-auto">
                   <thead>
                     <tr className="bg-slate-100">
-                      <th className="border border-slate-300 px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold text-slate-700 min-w-[140px]">
+                      <th className="border border-slate-300 px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold text-slate-700">
                         Item
                       </th>
                       <th className="border border-slate-300 px-2 md:px-3 py-2 text-center text-xs md:text-sm font-semibold text-slate-700 w-16 md:w-20">
@@ -269,7 +362,7 @@ export default function GateCheckForm() {
                       { key: 'registrationInsuranceCard', label: 'Registration / Insurance Card' }
                     ].map((item, index) => (
                       <tr key={item.key} className={index % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
-                        <td className="border border-slate-300 px-2 md:px-3 py-3 text-xs md:text-sm text-slate-700 font-medium">
+                        <td className="border border-slate-300 px-2 md:px-3 py-3 text-xs md:text-sm text-slate-700 font-medium whitespace-nowrap">
                           {item.label}
                         </td>
                         {['yes', 'no', 'needs service', 'na'].map((value) => (
@@ -302,10 +395,10 @@ export default function GateCheckForm() {
               </h2>
               
               <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
-                <table className="w-full border-collapse border border-slate-300 min-w-[600px]">
+                <table className="border-collapse border border-slate-300 min-w-[600px] table-auto">
                   <thead>
                     <tr className="bg-slate-100">
-                      <th className="border border-slate-300 px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold text-slate-700 min-w-[140px]">
+                      <th className="border border-slate-300 px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold text-slate-700">
                         Item
                       </th>
                       <th className="border border-slate-300 px-2 md:px-3 py-2 text-center text-xs md:text-sm font-semibold text-slate-700 w-16 md:w-20">
@@ -332,7 +425,7 @@ export default function GateCheckForm() {
                       { key: 'chemicalLabeledSecured', label: 'Chemical Labeled & Secured' }
                     ].map((item, index) => (
                       <tr key={item.key} className={index % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
-                        <td className="border border-slate-300 px-2 md:px-3 py-3 text-xs md:text-sm text-slate-700 font-medium">
+                        <td className="border border-slate-300 px-2 md:px-3 py-3 text-xs md:text-sm text-slate-700 font-medium whitespace-nowrap">
                           {item.label}
                         </td>
                         {['yes', 'no', 'needs service', 'na'].map((value) => (
