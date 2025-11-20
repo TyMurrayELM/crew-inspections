@@ -5,6 +5,7 @@ import { createClient } from '@supabase/supabase-js';
 import { FileText, Download, Plus, ClipboardCheck } from 'lucide-react';
 import Header from '../components/Header';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
 // Initialize Supabase client
 const supabase = createClient(
@@ -13,7 +14,10 @@ const supabase = createClient(
 );
 
 export default function ReportsPage() {
-  const [activeView, setActiveView] = useState('inspections'); // 'inspections' or 'gatechecks'
+  const searchParams = useSearchParams();
+  const viewParam = searchParams.get('view');
+  
+  const [activeView, setActiveView] = useState(viewParam === 'gatechecks' ? 'gatechecks' : 'inspections'); // 'inspections' or 'gatechecks'
   const [inspections, setInspections] = useState([]);
   const [gateChecks, setGateChecks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -1089,7 +1093,7 @@ export default function ReportsPage() {
                     className="w-full px-3 py-2 text-sm md:text-base border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
                     <option value="all">All Crews</option>
-                    {uniqueGateCheckCrews.sort().map((crew) => (
+                    {uniqueCrews.sort().map((crew) => (
                       <option key={crew} value={crew}>
                         {crew}
                       </option>
