@@ -194,7 +194,7 @@ export default function GateCheckForm() {
             actions={[
               {
                 label: 'View Reports',
-                href: '/reports',
+                href: '/reports?view=gatechecks',
                 icon: FileText,
                 variant: 'primary',
                 ariaLabel: 'View reports',
