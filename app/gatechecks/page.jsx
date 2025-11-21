@@ -170,11 +170,8 @@ export default function GateCheckForm() {
       alert('✅ Gate check submitted successfully!');
       console.log('Saved data:', data);
       
-      // Uncomment to redirect to reports after submission:
-      // window.location.href = '/reports';
-      
-      // Uncomment to clear form after submission:
-      // window.location.reload();
+      // Redirect to reports page with gate checks view
+      window.location.href = '/reports?view=gatechecks';
       
     } catch (error) {
       console.error('Error submitting gate check:', error);
