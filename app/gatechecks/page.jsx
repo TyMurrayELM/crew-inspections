@@ -231,11 +231,11 @@ export default function GateCheckForm() {
                     required
                   >
                     <option value="">Select location...</option>
-                    <option value="Corporate">Corporate</option>
-                    <option value="Phoenix - North">Phoenix - North</option>
-                    <option value="Phoenix - Southwest">Phoenix - Southwest</option>
-                    <option value="Phoenix - Southeast">Phoenix - Southeast</option>
-                    <option value="Las Vegas">Las Vegas</option>
+                    <option value="corporate">Corporate</option>
+                    <option value="phx-north">Phoenix - North</option>
+                    <option value="phx-southwest">Phoenix - Southwest</option>
+                    <option value="phx-southeast">Phoenix - Southeast</option>
+                    <option value="las-vegas">Las Vegas</option>
                   </select>
                 </div>
 

@@ -33,6 +33,16 @@ function ReportsPageContent() {
   const [sortField, setSortField] = useState('inspection_date');
   const [sortDirection, setSortDirection] = useState('desc');
 
+  // Reset filters when switching views
+  useEffect(() => {
+    setSearchTerm('');
+    setFilterBranch('all');
+    setFilterDepartment('all');
+    setFilterInspector('all');
+    setFilterCrew('all');
+    setFilterSafetyAlert('all');
+  }, [activeView]);
+
   useEffect(() => {
     if (activeView === 'inspections') {
       fetchInspections();
@@ -100,18 +110,40 @@ function ReportsPageContent() {
     });
   };
 
+  // Normalize location values to standard format (handles both old and new data)
+  const normalizeLocation = (loc) => {
+    if (!loc) return loc;
+    const map = {
+      'Phoenix - North': 'phx-north',
+      'Phoenix - Southwest': 'phx-southwest',
+      'Phoenix - Southeast': 'phx-southeast',
+      'Las Vegas': 'las-vegas',
+      'Corporate': 'corporate'
+    };
+    return map[loc] || loc;
+  };
+
   const getBranchDisplay = (branch) => {
     const branchMap = {
       'phx-southwest': 'Phx - Southwest',
       'phx-southeast': 'Phx - Southeast',
       'phx-north': 'Phx - North',
       'las-vegas': 'Las Vegas',
-      'corporate': 'Corporate'
+      'corporate': 'Corporate',
+      // Support for old format
+      'Phoenix - North': 'Phx - North',
+      'Phoenix - Southwest': 'Phx - Southwest',
+      'Phoenix - Southeast': 'Phx - Southeast',
+      'Las Vegas': 'Las Vegas',
+      'Corporate': 'Corporate'
     };
     return branchMap[branch] || branch;
   };
 
   const getBranchBadge = (branchValue) => {
+    // Normalize the value first
+    const normalized = normalizeLocation(branchValue) || branchValue;
+    
     const branchConfig = {
       'phx-north': { text: 'PHX N', color: 'bg-green-100 text-green-800 border-green-300' },
       'phx-southwest': { text: 'PHX SW', color: 'bg-blue-100 text-blue-800 border-blue-300' },
@@ -120,7 +152,7 @@ function ReportsPageContent() {
       'corporate': { text: 'Corporate', color: 'bg-gray-100 text-gray-800 border-gray-300' }
     };
     
-    const config = branchConfig[branchValue] || { text: branchValue, color: 'bg-gray-100 text-gray-800 border-gray-300' };
+    const config = branchConfig[normalized] || { text: branchValue || 'N/A', color: 'bg-gray-100 text-gray-800 border-gray-300' };
     
     return (
       <span className={`px-2 py-1 text-xs font-semibold rounded border ${config.color}`}>
@@ -270,7 +302,14 @@ function ReportsPageContent() {
       'maintenance': 'Maintenance',
       'maintenance-onsite': 'Maintenance Onsite',
       'overhead': 'Overhead',
-      'spray-phc': 'Spray / PHC'
+      'spray-phc': 'Spray / PHC',
+      // Gate check divisions (already in display format)
+      'Maintenance': 'Maintenance',
+      'Enhancement': 'Enhancement',
+      'Construction': 'Construction',
+      'Admin': 'Admin',
+      'Operations': 'Operations',
+      'Snow': 'Snow'
     };
     return departmentMap[departmentValue] || departmentValue;
   };
@@ -292,7 +331,9 @@ function ReportsPageContent() {
       'needs-work': 'bg-yellow-100 text-yellow-800',
       'not-working': 'bg-red-100 text-red-800',
       'need-service': 'bg-yellow-100 text-yellow-800',
-      'needs-attention': 'bg-orange-100 text-orange-800'
+      'needs-attention': 'bg-orange-100 text-orange-800',
+      'needs service': 'bg-yellow-100 text-yellow-800',
+      'na': 'bg-gray-100 text-gray-800'
     };
     
     const colorClass = badgeMap[value] || 'bg-gray-100 text-gray-800';
@@ -382,15 +423,18 @@ function ReportsPageContent() {
     return 0;
   });
 
-  // Filter gate-checks based on all filters
+  // Filter gate-checks based on all filters (with normalized location matching)
   const filteredGateChecks = gateChecks.filter(gateCheck => {
     const matchesSearch = 
       gateCheck.inspected_by?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       gateCheck.division?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       gateCheck.crew_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      gateCheck.driver_name?.toLowerCase().includes(searchTerm.toLowerCase());
+      gateCheck.driver_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      gateCheck.location?.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesLocation = filterBranch === 'all' || gateCheck.location === filterBranch;
+    // Normalize location for comparison (handles both old and new format)
+    const normalizedGateCheckLocation = normalizeLocation(gateCheck.location);
+    const matchesLocation = filterBranch === 'all' || normalizedGateCheckLocation === filterBranch;
     const matchesDivision = filterDepartment === 'all' || gateCheck.division === filterDepartment;
     const matchesInspector = filterInspector === 'all' || gateCheck.inspected_by === filterInspector;
     const matchesCrew = filterCrew === 'all' || gateCheck.crew_number === filterCrew;
@@ -994,10 +1038,11 @@ function ReportsPageContent() {
                     className="w-full px-3 py-2 text-sm md:text-base border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
                     <option value="all">All Branches</option>
+                    <option value="phx-north">Phx - North</option>
                     <option value="phx-southwest">Phx - SouthWest</option>
                     <option value="phx-southeast">Phx - SouthEast</option>
-                    <option value="phx-north">Phx - North</option>
                     <option value="las-vegas">Las Vegas</option>
+                    <option value="corporate">Corporate</option>
                   </select>
                   <select
                     value={filterDepartment}
@@ -1070,10 +1115,11 @@ function ReportsPageContent() {
                     className="w-full px-3 py-2 text-sm md:text-base border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
                     <option value="all">All Locations</option>
+                    <option value="phx-north">Phx - North</option>
                     <option value="phx-southwest">Phx - SouthWest</option>
                     <option value="phx-southeast">Phx - SouthEast</option>
-                    <option value="phx-north">Phx - North</option>
                     <option value="las-vegas">Las Vegas</option>
+                    <option value="corporate">Corporate</option>
                   </select>
                   <select
                     value={filterDepartment}
@@ -1093,7 +1139,7 @@ function ReportsPageContent() {
                     className="w-full px-3 py-2 text-sm md:text-base border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
                     <option value="all">All Crews</option>
-                    {uniqueCrews.sort().map((crew) => (
+                    {uniqueGateCheckCrews.sort().map((crew) => (
                       <option key={crew} value={crew}>
                         {crew}
                       </option>
