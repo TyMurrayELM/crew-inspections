@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import Header from './components/Header';
-import { ClipboardList, FileText } from 'lucide-react';
+import { ClipboardList, FileText, ChevronDown, Shield, HardHat, Wrench, Truck, AlertTriangle, Package, Clipboard } from 'lucide-react';
 
 export default function CrewInspectionChecklist() {
   // Language state
@@ -518,13 +518,8 @@ export default function CrewInspectionChecklist() {
       alert('✅ Inspection submitted successfully!');
       console.log('Saved data:', data);
       
-      // Option 1: Redirect to reports page to see the submitted inspection
-      // Uncomment the line below to automatically go to reports after submission:
-      // window.location.href = '/reports';
-      
-      // Option 2: Reset form and stay on this page
-      // Uncomment the line below if you want the form to clear after submission:
-      // window.location.reload();
+      // Redirect to reports page after successful submission
+      window.location.href = '/reports';
       
     } catch (error) {
       console.error('Error submitting inspection:', error);
@@ -532,783 +527,781 @@ export default function CrewInspectionChecklist() {
     }
   };
 
+  // Modern Section Header Component
+  const SectionHeader = ({ icon: Icon, title }) => (
+    <div className="flex items-center gap-3 pb-3 border-b-2 border-blue-500">
+      <div className="flex-shrink-0 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-2 shadow-lg shadow-blue-500/25">
+        <Icon className="w-4 h-4 text-white" strokeWidth={2.5} />
+      </div>
+      <h2 className="text-lg md:text-xl font-bold text-slate-800">{title}</h2>
+    </div>
+  );
+
+  // Modern Input styling
+  const inputClasses = "w-full px-4 py-3 text-base bg-slate-50/80 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white transition-all duration-200";
+  
+  // Modern Select with custom chevron
+  const SelectInput = ({ value, onChange, children, required = false, disabled = false }) => (
+    <div className="relative">
+      <select
+        value={value}
+        onChange={onChange}
+        className={`${inputClasses} appearance-none cursor-pointer pr-10 ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`}
+        required={required}
+        disabled={disabled}
+      >
+        {children}
+      </select>
+      <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+    </div>
+  );
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 py-4 md:py-8 px-3 md:px-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-4 md:py-8 px-3 md:px-4">
       <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg shadow-lg p-4 md:p-8">
-          {/* Header */}
-          <Header
-            title={t.title}
-            icon={ClipboardList}
-            showLanguageToggle={true}
-            language={language}
-            onLanguageChange={setLanguage}
-            actions={[
-              {
-                label: t.viewReports,
-                href: '/reports',
-                icon: FileText,
-                variant: 'primary',
-                ariaLabel: 'View inspection reports',
-              },
-            ]}
-          />
+        {/* Modern Card Container */}
+        <div className="relative">
+          <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/20 via-emerald-500/20 to-blue-500/20 rounded-2xl blur-xl opacity-50" />
+          <div className="relative bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-100 overflow-hidden">
+            {/* Top accent line */}
+            <div className="h-1 bg-gradient-to-r from-blue-500 via-emerald-500 to-blue-500" />
+            
+            <div className="p-4 md:p-8">
+              {/* Header */}
+              <Header
+                title={t.title}
+                icon={ClipboardList}
+                showLanguageToggle={true}
+                language={language}
+                onLanguageChange={setLanguage}
+                actions={[
+                  {
+                    label: t.viewReports,
+                    href: '/reports',
+                    icon: FileText,
+                    variant: 'primary',
+                    ariaLabel: 'View inspection reports',
+                  },
+                ]}
+              />
 
-          <form onSubmit={handleSubmit} className="space-y-6 md:space-y-8">
-            {/* Basic Information */}
-            <section className="space-y-4">
-              <h2 className="text-lg md:text-xl font-semibold text-slate-800 border-b-2 border-blue-600 pb-2">
-                {t.inspectionInfo}
-              </h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
-                    {t.dateTime} {t.required}
-                  </label>
-                  <input
-                    type="datetime-local"
-                    value={formData.date}
-                    onChange={(e) => handleInputChange('date', e.target.value)}
-                    className="w-full px-3 py-2 text-base border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
-                    {t.inspectedBy} {t.required}
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.inspectedBy}
-                    onChange={(e) => handleInputChange('inspectedBy', e.target.value)}
-                    className="w-full px-3 py-2 text-base border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
-                    {t.crewBranch} {t.required}
-                  </label>
-                  <select
-                    value={formData.crewBranch}
-                    onChange={(e) => handleInputChange('crewBranch', e.target.value)}
-                    className="w-full px-3 py-2 text-base border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    required
-                  >
-                    <option value="">Select Branch</option>
-                    <option value="phx-southwest">Phx - SouthWest</option>
-                    <option value="phx-southeast">Phx - SouthEast</option>
-                    <option value="phx-north">Phx - North</option>
-                    <option value="las-vegas">Las Vegas</option>
-                    <option value="corporate">Corporate</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
-                    {t.crewObserved} {t.required}
-                  </label>
-                  <select
-                    value={formData.crewObserved}
-                    onChange={(e) => handleInputChange('crewObserved', e.target.value)}
-                    className="w-full px-3 py-2 text-base border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    required
-                    disabled={!formData.crewBranch}
-                  >
-                    <option value="">
-                      {formData.crewBranch ? t.selectCrew : t.selectBranchFirstOption}
-                    </option>
-                    {getAvailableCrews().map((crew) => (
-                      <option key={crew} value={crew}>
-                        {crew}
-                      </option>
-                    ))}
-                  </select>
-                  {!formData.crewBranch && (
-                    <p className="mt-1 text-xs text-slate-500">
-                      {t.selectBranchFirst}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
-                    {t.department} {t.required}
-                  </label>
-                  <select
-                    value={formData.department}
-                    onChange={(e) => handleInputChange('department', e.target.value)}
-                    className="w-full px-3 py-2 text-base border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    required
-                  >
-                    <option value="">Select Department</option>
-                    <option value="arbor">Arbor</option>
-                    <option value="enhancements">Enhancements</option>
-                    <option value="irrigation">Irrigation</option>
-                    <option value="maintenance">Maintenance</option>
-                    <option value="maintenance-onsite">Maintenance Onsite</option>
-                    <option value="overhead">Overhead</option>
-                    <option value="spray-phc">Spray / PHC</option>
-                  </select>
-                </div>
-              </div>
-            </section>
-
-            {/* Safety Cones */}
-            <section className="space-y-4">
-              <h2 className="text-lg md:text-xl font-semibold text-slate-800 border-b-2 border-blue-600 pb-2">
-                {t.safetyEquipment}
-              </h2>
-              
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  {t.safetyConesQuestion} {t.required}
-                </label>
-                <div className="flex flex-wrap gap-4">
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="safetyCones"
-                      value="yes"
-                      checked={formData.safetyCones === 'yes'}
-                      onChange={(e) => handleInputChange('safetyCones', e.target.value)}
-                      className="mr-2 w-4 h-4 text-blue-600 focus:ring-blue-500"
-                      required
-                    />
-                    <span className="text-sm md:text-base text-slate-700">{t.yes}</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="safetyCones"
-                      value="no"
-                      checked={formData.safetyCones === 'no'}
-                      onChange={(e) => handleInputChange('safetyCones', e.target.value)}
-                      className="mr-2 w-4 h-4 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="text-sm md:text-base text-slate-700">{t.no}</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="safetyCones"
-                      value="na"
-                      checked={formData.safetyCones === 'na'}
-                      onChange={(e) => handleInputChange('safetyCones', e.target.value)}
-                      className="mr-2 w-4 h-4 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="text-sm md:text-base text-slate-700">{t.na}</span>
-                  </label>
-                </div>
-              </div>
-            </section>
-
-            {/* Ladder Observation */}
-            <section className="space-y-4">
-              <h2 className="text-lg md:text-xl font-semibold text-slate-800 border-b-2 border-blue-600 pb-2">
-                {t.ladderObservation}
-              </h2>
-              
-              <div className="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0">
-                <table className="w-full border-collapse min-w-[600px] table-fixed">
-                  <thead>
-                    <tr className="bg-slate-100">
-                      <th className="border border-slate-300 px-3 md:px-4 py-2 text-left text-xs md:text-sm font-medium text-slate-700 w-[55%]">
-                        {t.item}
-                      </th>
-                      <th className="border border-slate-300 px-3 md:px-4 py-2 text-center text-xs md:text-sm font-medium text-slate-700 w-[22.5%]">
-                        {t.yes}
-                      </th>
-                      <th className="border border-slate-300 px-3 md:px-4 py-2 text-center text-xs md:text-sm font-medium text-slate-700 w-[22.5%]">
-                        {t.no}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {[
-                      { key: 'laddersPlacedSecured', label: t.laddersPlaced },
-                      { key: 'ladderLabelsVisible', label: t.ladderLabels },
-                      { key: 'laddersUsedCorrectly', label: t.laddersUsed }
-                    ].map(({ key, label }) => (
-                      <tr key={key}>
-                        <td className="border border-slate-300 px-3 md:px-4 py-2 text-xs md:text-sm text-slate-700 font-medium">
-                          {label}
-                        </td>
-                        {['yes', 'no'].map((value) => (
-                          <td key={value} className={`border border-slate-300 px-3 md:px-4 py-2 text-center ${getCellBackgroundClass(formData[key], value)}`}>
-                            <input
-                              type="radio"
-                              name={key}
-                              value={value}
-                              checked={formData[key] === value}
-                              onChange={(e) => handleInputChange(key, e.target.value)}
-                              className="w-4 h-4 text-blue-600 focus:ring-blue-500"
-                              required
-                            />
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  {t.ladderNotes}
-                </label>
-                <textarea
-                  value={formData.ladderNotes}
-                  onChange={(e) => handleInputChange('ladderNotes', e.target.value)}
-                  rows={3}
-                  className="w-full px-3 py-2 text-base border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder={t.notesPlaceholder}
-                />
-              </div>
-            </section>
-
-            {/* PPE Crew Observation */}
-            <section className="space-y-4">
-              <h2 className="text-lg md:text-xl font-semibold text-slate-800 border-b-2 border-blue-600 pb-2">
-                {t.ppeObservation} {t.required}
-              </h2>
-              <p className="text-xs md:text-sm text-slate-600">
-                {t.ppeQuestion}
-              </p>
-              
-              <div className="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0">
-                <table className="w-full border-collapse min-w-[600px] table-fixed">
-                  <thead>
-                    <tr className="bg-slate-100">
-                      <th className="border border-slate-300 px-3 md:px-4 py-2 text-left text-xs md:text-sm font-medium text-slate-700 w-[55%]">
-                        {t.ppeItem}
-                      </th>
-                      <th className="border border-slate-300 px-3 md:px-4 py-2 text-center text-xs md:text-sm font-medium text-slate-700 w-[22.5%]">
-                        {t.yes}
-                      </th>
-                      <th className="border border-slate-300 px-3 md:px-4 py-2 text-center text-xs md:text-sm font-medium text-slate-700 w-[22.5%]">
-                        {t.no}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {[
-                      { key: 'ppeEyeProtection', label: t.eyeProtection },
-                      { key: 'ppeHearingProtection', label: t.hearingProtection },
-                      { key: 'ppeHandProtection', label: t.handProtection },
-                      { key: 'ppeFootProtection', label: t.footProtection },
-                      { key: 'ppeHeadProtection', label: t.headProtection }
-                    ].map(({ key, label }) => (
-                      <tr key={key}>
-                        <td className="border border-slate-300 px-3 md:px-4 py-2 text-xs md:text-sm text-slate-700 font-medium">
-                          {label}
-                        </td>
-                        {['yes', 'no'].map((value) => (
-                          <td key={value} className={`border border-slate-300 px-3 md:px-4 py-2 text-center ${getCellBackgroundClass(formData[key], value)}`}>
-                            <input
-                              type="radio"
-                              name={key}
-                              value={value}
-                              checked={formData[key] === value}
-                              onChange={(e) => handleInputChange(key, e.target.value)}
-                              className="w-4 h-4 text-blue-600 focus:ring-blue-500"
-                              required
-                            />
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  {t.ppeNotes}
-                </label>
-                <textarea
-                  value={formData.ppeNotes}
-                  onChange={(e) => handleInputChange('ppeNotes', e.target.value)}
-                  rows={3}
-                  className="w-full px-3 py-2 text-base border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder={t.notesPlaceholder}
-                />
-              </div>
-            </section>
-
-            {/* Tools and Equipment */}
-            <section className="space-y-4">
-              <h2 className="text-lg md:text-xl font-semibold text-slate-800 border-b-2 border-blue-600 pb-2">
-                {t.toolsEquipment}
-              </h2>
-              
-              <div className="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0">
-                <table className="w-full border-collapse min-w-[700px]">
-                  <thead>
-                    <tr className="bg-slate-100">
-                      <th className="border border-slate-300 px-2 md:px-4 py-2 text-left text-xs md:text-sm font-medium text-slate-700">
-                        {t.equipment}
-                      </th>
-                      <th className="border border-slate-300 px-2 md:px-4 py-2 text-center text-xs md:text-sm font-medium text-slate-700">
-                        {t.good}
-                      </th>
-                      <th className="border border-slate-300 px-2 md:px-4 py-2 text-center text-xs md:text-sm font-medium text-slate-700">
-                        {t.bad}
-                      </th>
-                      <th className="border border-slate-300 px-2 md:px-4 py-2 text-center text-xs md:text-sm font-medium text-slate-700">
-                        {t.missing}
-                      </th>
-                      <th className="border border-slate-300 px-2 md:px-4 py-2 text-center text-xs md:text-sm font-medium text-slate-700">
-                        {t.notWorking}
-                      </th>
-                      <th className="border border-slate-300 px-2 md:px-4 py-2 text-center text-xs md:text-sm font-medium text-slate-700">
-                        {t.needsWork}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {[
-                      { key: 'mowersCondition', label: t.mowers },
-                      { key: 'blowersCondition', label: t.blowers },
-                      { key: 'hedgeTrimmerCondition', label: t.hedgeTrimmer },
-                      { key: 'lineTrimmerCondition', label: t.lineTrimmer },
-                      { key: 'gasTanksCondition', label: t.gasTanks }
-                    ].map(({ key, label }) => (
-                      <tr key={key}>
-                        <td className="border border-slate-300 px-2 md:px-4 py-2 text-xs md:text-sm text-slate-700 font-medium">
-                          {label}
-                        </td>
-                        {['good', 'bad', 'missing', 'not-working', 'needs-work'].map((condition) => (
-                          <td key={condition} className={`border border-slate-300 px-2 md:px-4 py-2 text-center ${getCellBackgroundClass(formData[key], condition)}`}>
-                            <input
-                              type="radio"
-                              name={key}
-                              value={condition}
-                              checked={formData[key] === condition}
-                              onChange={(e) => handleInputChange(key, e.target.value)}
-                              className="w-4 h-4 text-blue-600 focus:ring-blue-500"
-                            />
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  {t.toolsNotes}
-                </label>
-                <textarea
-                  value={formData.toolsEquipmentNotes}
-                  onChange={(e) => handleInputChange('toolsEquipmentNotes', e.target.value)}
-                  rows={3}
-                  className="w-full px-3 py-2 text-base border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder={t.notesPlaceholder}
-                />
-              </div>
-            </section>
-
-            {/* Vehicle Emergency Equipment */}
-            <section className="space-y-4">
-              <h2 className="text-lg md:text-xl font-semibold text-slate-800 border-b-2 border-blue-600 pb-2">
-                {t.vehicleEmergency}
-              </h2>
-              
-              <div className="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0">
-                <table className="w-full border-collapse min-w-[700px]">
-                  <thead>
-                    <tr className="bg-slate-100">
-                      <th className="border border-slate-300 px-2 md:px-4 py-2 text-left text-xs md:text-sm font-medium text-slate-700">
-                        {t.equipment}
-                      </th>
-                      <th className="border border-slate-300 px-2 md:px-4 py-2 text-center text-xs md:text-sm font-medium text-slate-700">
-                        {t.good}
-                      </th>
-                      <th className="border border-slate-300 px-2 md:px-4 py-2 text-center text-xs md:text-sm font-medium text-slate-700">
-                        {t.bad}
-                      </th>
-                      <th className="border border-slate-300 px-2 md:px-4 py-2 text-center text-xs md:text-sm font-medium text-slate-700">
-                        {t.missing}
-                      </th>
-                      <th className="border border-slate-300 px-2 md:px-4 py-2 text-center text-xs md:text-sm font-medium text-slate-700">
-                        {t.needService}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {[
-                      { key: 'fireExtinguisherCondition', label: t.fireExtinguisher },
-                      { key: 'firstAidKitCondition', label: t.firstAidKit },
-                      { key: 'waterJugCondition', label: t.waterJug },
-                      { key: 'warningTriangleCondition', label: t.warningTriangle }
-                    ].map(({ key, label }) => (
-                      <tr key={key}>
-                        <td className="border border-slate-300 px-2 md:px-4 py-2 text-xs md:text-sm text-slate-700 font-medium">
-                          {label}
-                        </td>
-                        {['good', 'bad', 'missing', 'need-service'].map((condition) => (
-                          <td key={condition} className={`border border-slate-300 px-2 md:px-4 py-2 text-center ${getCellBackgroundClass(formData[key], condition)}`}>
-                            <input
-                              type="radio"
-                              name={key}
-                              value={condition}
-                              checked={formData[key] === condition}
-                              onChange={(e) => handleInputChange(key, e.target.value)}
-                              className="w-4 h-4 text-blue-600 focus:ring-blue-500"
-                            />
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  {t.emergencyNotes}
-                </label>
-                <textarea
-                  value={formData.emergencyEquipmentNotes}
-                  onChange={(e) => handleInputChange('emergencyEquipmentNotes', e.target.value)}
-                  rows={3}
-                  className="w-full px-3 py-2 text-base border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder={t.notesPlaceholder}
-                />
-              </div>
-            </section>
-
-            {/* Vehicle Inspection */}
-            <section className="space-y-4">
-              <h2 className="text-lg md:text-xl font-semibold text-slate-800 border-b-2 border-blue-600 pb-2">
-                {t.vehicleInspection}
-              </h2>
-              
-              <div className="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0">
-                <table className="w-full border-collapse min-w-[800px]">
-                  <thead>
-                    <tr className="bg-slate-100">
-                      <th className="border border-slate-300 px-2 md:px-4 py-2 text-left text-xs md:text-sm font-medium text-slate-700">
-                        {t.item}
-                      </th>
-                      <th className="border border-slate-300 px-2 md:px-4 py-2 text-center text-xs md:text-sm font-medium text-slate-700">
-                        {t.yes}
-                      </th>
-                      <th className="border border-slate-300 px-2 md:px-4 py-2 text-center text-xs md:text-sm font-medium text-slate-700">
-                        {t.no}
-                      </th>
-                      <th className="border border-slate-300 px-2 md:px-4 py-2 text-center text-xs md:text-sm font-medium text-slate-700">
-                        {t.good}
-                      </th>
-                      <th className="border border-slate-300 px-2 md:px-4 py-2 text-center text-xs md:text-sm font-medium text-slate-700">
-                        {t.bad}
-                      </th>
-                      <th className="border border-slate-300 px-2 md:px-4 py-2 text-center text-xs md:text-sm font-medium text-slate-700">
-                        {t.needsWork}
-                      </th>
-                      <th className="border border-slate-300 px-2 md:px-4 py-2 text-center text-xs md:text-sm font-medium text-slate-700">
-                        {t.needsAttention}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {[
-                      { key: 'dashClean', label: t.dashClean },
-                      { key: 'tireCondition', label: t.tireCondition },
-                      { key: 'truckClean', label: t.truckClean },
-                      { key: 'tarpWorking', label: t.tarpWorking },
-                      { key: 'insideVehicleCondition', label: t.insideVehicle }
-                    ].map(({ key, label }) => (
-                      <tr key={key}>
-                        <td className="border border-slate-300 px-2 md:px-4 py-2 text-xs md:text-sm text-slate-700 font-medium">
-                          {label}
-                        </td>
-                        {['yes', 'no', 'good', 'bad', 'needs-work', 'needs-attention'].map((condition) => (
-                          <td key={condition} className={`border border-slate-300 px-2 md:px-4 py-2 text-center ${getCellBackgroundClass(formData[key], condition)}`}>
-                            <input
-                              type="radio"
-                              name={key}
-                              value={condition}
-                              checked={formData[key] === condition}
-                              onChange={(e) => handleInputChange(key, e.target.value)}
-                              className="w-4 h-4 text-blue-600 focus:ring-blue-500"
-                            />
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  {t.vehicleNotes}
-                </label>
-                <textarea
-                  value={formData.vehicleNotes}
-                  onChange={(e) => handleInputChange('vehicleNotes', e.target.value)}
-                  rows={3}
-                  className="w-full px-3 py-2 text-base border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder={t.notesPlaceholder}
-                />
-              </div>
-            </section>
-
-            {/* Trailer Inspection */}
-            <section className="space-y-4">
-              <h2 className="text-lg md:text-xl font-semibold text-slate-800 border-b-2 border-blue-600 pb-2">
-                {t.trailerInspection}
-              </h2>
-              
-              <div className="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0">
-                <table className="w-full border-collapse min-w-[700px]">
-                  <thead>
-                    <tr className="bg-slate-100">
-                      <th className="border border-slate-300 px-2 md:px-4 py-2 text-left text-xs md:text-sm font-medium text-slate-700">
-                        {t.item}
-                      </th>
-                      <th className="border border-slate-300 px-2 md:px-4 py-2 text-center text-xs md:text-sm font-medium text-slate-700">
-                        {t.goodCondition}
-                      </th>
-                      <th className="border border-slate-300 px-2 md:px-4 py-2 text-center text-xs md:text-sm font-medium text-slate-700">
-                        {t.badCondition}
-                      </th>
-                      <th className="border border-slate-300 px-2 md:px-4 py-2 text-center text-xs md:text-sm font-medium text-slate-700">
-                        {t.needsWork}
-                      </th>
-                      <th className="border border-slate-300 px-2 md:px-4 py-2 text-center text-xs md:text-sm font-medium text-slate-700">
-                        {t.missing}
-                      </th>
-                      <th className="border border-slate-300 px-2 md:px-4 py-2 text-center text-xs md:text-sm font-medium text-slate-700">
-                        {t.need}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {[
-                      { key: 'trailerConnection', label: t.trailerConnection },
-                      { key: 'trailerBrakeAway', label: t.trailerBrakeAway },
-                      { key: 'trailerChains', label: t.trailerChains },
-                      { key: 'trailerLockPin', label: t.trailerLockPin },
-                      { key: 'trailerTires', label: t.trailerTires },
-                      { key: 'trailerSecured', label: t.trailerSecured },
-                      { key: 'trailerCleanliness', label: t.trailerCleanliness },
-                      { key: 'spareTire', label: t.spareTire }
-                    ].map(({ key, label }) => (
-                      <tr key={key}>
-                        <td className="border border-slate-300 px-2 md:px-4 py-2 text-xs md:text-sm text-slate-700 font-medium">
-                          {label}
-                        </td>
-                        {['good', 'bad', 'needs-work', 'missing', 'need'].map((condition) => (
-                          <td key={condition} className={`border border-slate-300 px-2 md:px-4 py-2 text-center ${getCellBackgroundClass(formData[key], condition)}`}>
-                            <input
-                              type="radio"
-                              name={key}
-                              value={condition}
-                              checked={formData[key] === condition}
-                              onChange={(e) => handleInputChange(key, e.target.value)}
-                              className="w-4 h-4 text-blue-600 focus:ring-blue-500"
-                            />
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  {t.trailerNotes}
-                </label>
-                <textarea
-                  value={formData.trailerNotes}
-                  onChange={(e) => handleInputChange('trailerNotes', e.target.value)}
-                  rows={3}
-                  className="w-full px-3 py-2 text-base border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder={t.notesPlaceholder}
-                />
-              </div>
-            </section>
-
-            {/* Chemical Storage */}
-            <section className="space-y-4">
-              <h2 className="text-lg md:text-xl font-semibold text-slate-800 border-b-2 border-blue-600 pb-2">
-                {t.chemicalStorage}
-              </h2>
-              
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  {t.chemicalsQuestion} {t.required}
-                </label>
-                <div className="space-y-2">
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="chemicalsStoredProperly"
-                      value="yes"
-                      checked={formData.chemicalsStoredProperly === 'yes'}
-                      onChange={(e) => handleInputChange('chemicalsStoredProperly', e.target.value)}
-                      className="mr-2 w-4 h-4 text-blue-600 focus:ring-blue-500"
-                      required
-                    />
-                    <span className="text-sm md:text-base text-slate-700">{t.yes}</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="chemicalsStoredProperly"
-                      value="no"
-                      checked={formData.chemicalsStoredProperly === 'no'}
-                      onChange={(e) => handleInputChange('chemicalsStoredProperly', e.target.value)}
-                      className="mr-2 w-4 h-4 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="text-sm md:text-base text-slate-700">{t.no}</span>
-                  </label>
-                </div>
-              </div>
-
-              {/* Conditionally show issues only when "No" is selected */}
-              {formData.chemicalsStoredProperly === 'no' && (
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    {t.selectAllApply}
-                  </label>
-                  <div className="space-y-2">
-                    {['Containers are not Labeled', 'Not Properly Stored', 'NA', 'Other'].map((option) => (
-                      <label key={option} className="flex items-center">
-                        <input
-                          type="checkbox"
-                          checked={formData.chemicalIssues.includes(option)}
-                          onChange={() => handleCheckboxChange('chemicalIssues', option)}
-                          className="mr-2 w-4 h-4 text-blue-600 focus:ring-blue-500 rounded"
-                        />
-                        <span className="text-sm md:text-base text-slate-700">{option}</span>
+              <form onSubmit={handleSubmit} className="space-y-8">
+                {/* Basic Information */}
+                <section className="space-y-4">
+                  <SectionHeader icon={Clipboard} title={t.inspectionInfo} />
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-2">
+                        {t.dateTime} {t.required}
                       </label>
-                    ))}
+                      <input
+                        type="datetime-local"
+                        value={formData.date}
+                        onChange={(e) => handleInputChange('date', e.target.value)}
+                        className={inputClasses}
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-2">
+                        {t.inspectedBy} {t.required}
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.inspectedBy}
+                        onChange={(e) => handleInputChange('inspectedBy', e.target.value)}
+                        className={inputClasses}
+                        placeholder="Enter your name"
+                        required
+                      />
+                    </div>
                   </div>
-                </div>
-              )}
-            </section>
 
-            {/* Additional Notes and Follow-Up */}
-            <section className="space-y-4">
-              <h2 className="text-lg md:text-xl font-semibold text-slate-800 border-b-2 border-blue-600 pb-2">
-                {t.additionalNotes}
-              </h2>
-              
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  {t.additionalNotesLabel}
-                </label>
-                <textarea
-                  value={formData.additionalNotes}
-                  onChange={(e) => handleInputChange('additionalNotes', e.target.value)}
-                  rows={4}
-                  className="w-full px-3 py-2 text-base border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder={t.notesPlaceholder}
-                />
-              </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-2">
+                        {t.crewBranch} {t.required}
+                      </label>
+                      <SelectInput
+                        value={formData.crewBranch}
+                        onChange={(e) => handleInputChange('crewBranch', e.target.value)}
+                        required
+                      >
+                        <option value="">Select Branch</option>
+                        <option value="phx-southwest">Phx - SouthWest</option>
+                        <option value="phx-southeast">Phx - SouthEast</option>
+                        <option value="phx-north">Phx - North</option>
+                        <option value="las-vegas">Las Vegas</option>
+                        <option value="corporate">Corporate</option>
+                      </SelectInput>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-2">
+                        {t.crewObserved} {t.required}
+                      </label>
+                      <SelectInput
+                        value={formData.crewObserved}
+                        onChange={(e) => handleInputChange('crewObserved', e.target.value)}
+                        required
+                        disabled={!formData.crewBranch}
+                      >
+                        <option value="">
+                          {formData.crewBranch ? t.selectCrew : t.selectBranchFirstOption}
+                        </option>
+                        {getAvailableCrews().map((crew) => (
+                          <option key={crew} value={crew}>
+                            {crew}
+                          </option>
+                        ))}
+                      </SelectInput>
+                      {!formData.crewBranch && (
+                        <p className="mt-1.5 text-xs text-slate-500">
+                          {t.selectBranchFirst}
+                        </p>
+                      )}
+                    </div>
+                  </div>
 
-              <div className="bg-orange-50 border-2 border-orange-400 rounded-lg p-4 md:p-5">
-                <div className="flex items-start gap-3 mb-3">
-                  <span className="text-2xl">⚠️</span>
-                  <label className="block text-base md:text-lg font-semibold text-orange-900">
-                    {t.safetyIssueASAP} {t.required}
-                  </label>
-                </div>
-                <div className="flex flex-wrap gap-4 ml-0 md:ml-11">
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="safetyIssueASAP"
-                      value="yes"
-                      checked={formData.safetyIssueASAP === 'yes'}
-                      onChange={(e) => handleInputChange('safetyIssueASAP', e.target.value)}
-                      className="mr-2 w-5 h-5 text-orange-600 focus:ring-orange-500"
-                      required
-                    />
-                    <span className="text-sm md:text-base font-medium text-orange-900">{t.yes}</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="safetyIssueASAP"
-                      value="no"
-                      checked={formData.safetyIssueASAP === 'no'}
-                      onChange={(e) => handleInputChange('safetyIssueASAP', e.target.value)}
-                      className="mr-2 w-5 h-5 text-orange-600 focus:ring-orange-500"
-                    />
-                    <span className="text-sm md:text-base font-medium text-orange-900">{t.no}</span>
-                  </label>
-                </div>
-              </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-2">
+                        {t.department} {t.required}
+                      </label>
+                      <SelectInput
+                        value={formData.department}
+                        onChange={(e) => handleInputChange('department', e.target.value)}
+                        required
+                      >
+                        <option value="">Select Department</option>
+                        <option value="Arbor">Arbor</option>
+                        <option value="Enhancements">Enhancements</option>
+                        <option value="Irrigation">Irrigation</option>
+                        <option value="Maintenance">Maintenance</option>
+                        <option value="Maintenance Onsite">Maintenance Onsite</option>
+                        <option value="Overhead">Overhead</option>
+                        <option value="Spray / PHC">Spray / PHC</option>
+                      </SelectInput>
+                    </div>
+                  </div>
+                </section>
 
-              {/* Conditionally show safety issues explanation only when "Yes" is selected */}
-              {formData.safetyIssueASAP === 'yes' && (
-                <div className="bg-red-50 border-2 border-red-400 rounded-lg p-4 md:p-5">
-                  <div className="flex items-start gap-2 mb-2">
-                    <span className="text-xl">🚨</span>
-                    <label className="block text-sm md:text-base font-semibold text-red-900">
-                      {t.immediateSafetyQuestion}
+                {/* Safety Cones */}
+                <section className="space-y-4">
+                  <SectionHeader icon={Shield} title={t.safetyEquipment} />
+                  
+                  <div className="bg-slate-50/80 rounded-xl p-4 border border-slate-200">
+                    <label className="block text-sm font-semibold text-slate-700 mb-3">
+                      {t.safetyConesQuestion} {t.required}
                     </label>
+                    <div className="flex flex-wrap gap-4">
+                      {['yes', 'no', 'na'].map((value) => (
+                        <label key={value} className="flex items-center cursor-pointer group">
+                          <input
+                            type="radio"
+                            name="safetyCones"
+                            value={value}
+                            checked={formData.safetyCones === value}
+                            onChange={(e) => handleInputChange('safetyCones', e.target.value)}
+                            className="w-5 h-5 text-blue-600 focus:ring-blue-500 focus:ring-2 cursor-pointer"
+                            required
+                          />
+                          <span className="ml-2 text-sm md:text-base text-slate-700 font-medium group-hover:text-blue-600 transition-colors">
+                            {value === 'yes' ? t.yes : value === 'no' ? t.no : t.na}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
                   </div>
-                  <textarea
-                    value={formData.immediateSafetyIssues}
-                    onChange={(e) => handleInputChange('immediateSafetyIssues', e.target.value)}
-                    rows={3}
-                    className="w-full px-3 py-2 text-base border-2 border-red-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white"
-                    placeholder={t.safetyConcernsPlaceholder}
-                  />
+                </section>
+
+                {/* Ladder Observation */}
+                <section className="space-y-4">
+                  <SectionHeader icon={Wrench} title={t.ladderObservation} />
+                  
+                  <div className="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0">
+                    <table className="w-full border-collapse min-w-[600px] rounded-xl overflow-hidden shadow-sm">
+                      <thead>
+                        <tr className="bg-gradient-to-r from-blue-500 to-blue-600">
+                          <th className="px-3 md:px-4 py-3 text-left text-xs md:text-sm font-semibold text-white w-[55%]">
+                            {t.item}
+                          </th>
+                          <th className="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-white w-[22.5%]">
+                            {t.yes}
+                          </th>
+                          <th className="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-white w-[22.5%]">
+                            {t.no}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[
+                          { key: 'laddersPlacedSecured', label: t.laddersPlaced },
+                          { key: 'ladderLabelsVisible', label: t.ladderLabels },
+                          { key: 'laddersUsedCorrectly', label: t.laddersUsed }
+                        ].map(({ key, label }, index) => (
+                          <tr key={key} className={`${index % 2 === 0 ? 'bg-white' : 'bg-blue-50/30'} hover:bg-blue-50 transition-colors`}>
+                            <td className="border-b border-slate-200 px-3 md:px-4 py-3 text-xs md:text-sm text-slate-700 font-medium">
+                              {label}
+                            </td>
+                            {['yes', 'no'].map((value) => (
+                              <td key={value} className={`border-b border-slate-200 px-3 md:px-4 py-3 text-center ${getCellBackgroundClass(formData[key], value)}`}>
+                                <input
+                                  type="radio"
+                                  name={key}
+                                  value={value}
+                                  checked={formData[key] === value}
+                                  onChange={(e) => handleInputChange(key, e.target.value)}
+                                  className="w-5 h-5 text-blue-600 focus:ring-blue-500 focus:ring-2 cursor-pointer"
+                                  required
+                                />
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <p className="text-xs text-slate-500 italic md:hidden flex items-center gap-1">
+                    <span>←</span> Scroll horizontally to see all options <span>→</span>
+                  </p>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      {t.ladderNotes}
+                    </label>
+                    <textarea
+                      value={formData.ladderNotes}
+                      onChange={(e) => handleInputChange('ladderNotes', e.target.value)}
+                      rows={3}
+                      className={`${inputClasses} resize-none`}
+                      placeholder={t.notesPlaceholder}
+                    />
+                  </div>
+                </section>
+
+                {/* PPE Crew Observation */}
+                <section className="space-y-4">
+                  <SectionHeader icon={HardHat} title={t.ppeObservation} />
+                  <p className="text-sm text-slate-600 bg-blue-50/50 rounded-lg px-4 py-2 border border-blue-100">
+                    {t.ppeQuestion}
+                  </p>
+                  
+                  <div className="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0">
+                    <table className="w-full border-collapse min-w-[600px] rounded-xl overflow-hidden shadow-sm">
+                      <thead>
+                        <tr className="bg-gradient-to-r from-blue-500 to-blue-600">
+                          <th className="px-3 md:px-4 py-3 text-left text-xs md:text-sm font-semibold text-white w-[55%]">
+                            {t.ppeItem}
+                          </th>
+                          <th className="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-white w-[22.5%]">
+                            {t.yes}
+                          </th>
+                          <th className="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-white w-[22.5%]">
+                            {t.no}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[
+                          { key: 'ppeEyeProtection', label: t.eyeProtection },
+                          { key: 'ppeHearingProtection', label: t.hearingProtection },
+                          { key: 'ppeHandProtection', label: t.handProtection },
+                          { key: 'ppeFootProtection', label: t.footProtection },
+                          { key: 'ppeHeadProtection', label: t.headProtection }
+                        ].map(({ key, label }, index) => (
+                          <tr key={key} className={`${index % 2 === 0 ? 'bg-white' : 'bg-blue-50/30'} hover:bg-blue-50 transition-colors`}>
+                            <td className="border-b border-slate-200 px-3 md:px-4 py-3 text-xs md:text-sm text-slate-700 font-medium">
+                              {label}
+                            </td>
+                            {['yes', 'no'].map((value) => (
+                              <td key={value} className={`border-b border-slate-200 px-3 md:px-4 py-3 text-center ${getCellBackgroundClass(formData[key], value)}`}>
+                                <input
+                                  type="radio"
+                                  name={key}
+                                  value={value}
+                                  checked={formData[key] === value}
+                                  onChange={(e) => handleInputChange(key, e.target.value)}
+                                  className="w-5 h-5 text-blue-600 focus:ring-blue-500 focus:ring-2 cursor-pointer"
+                                  required
+                                />
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <p className="text-xs text-slate-500 italic md:hidden flex items-center gap-1">
+                    <span>←</span> Scroll horizontally to see all options <span>→</span>
+                  </p>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      {t.ppeNotes}
+                    </label>
+                    <textarea
+                      value={formData.ppeNotes}
+                      onChange={(e) => handleInputChange('ppeNotes', e.target.value)}
+                      rows={3}
+                      className={`${inputClasses} resize-none`}
+                      placeholder={t.notesPlaceholder}
+                    />
+                  </div>
+                </section>
+
+                {/* Tools and Equipment */}
+                <section className="space-y-4">
+                  <SectionHeader icon={Wrench} title={t.toolsEquipment} />
+                  
+                  <div className="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0">
+                    <table className="w-full border-collapse min-w-[700px] rounded-xl overflow-hidden shadow-sm">
+                      <thead>
+                        <tr className="bg-gradient-to-r from-blue-500 to-blue-600">
+                          <th className="px-2 md:px-4 py-3 text-left text-xs md:text-sm font-semibold text-white">
+                            {t.equipment}
+                          </th>
+                          <th className="px-2 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-white">
+                            {t.good}
+                          </th>
+                          <th className="px-2 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-white">
+                            {t.bad}
+                          </th>
+                          <th className="px-2 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-white">
+                            {t.missing}
+                          </th>
+                          <th className="px-2 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-white">
+                            {t.notWorking}
+                          </th>
+                          <th className="px-2 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-white">
+                            {t.needsWork}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[
+                          { key: 'mowersCondition', label: t.mowers },
+                          { key: 'blowersCondition', label: t.blowers },
+                          { key: 'hedgeTrimmerCondition', label: t.hedgeTrimmer },
+                          { key: 'lineTrimmerCondition', label: t.lineTrimmer },
+                          { key: 'gasTanksCondition', label: t.gasTanks }
+                        ].map(({ key, label }, index) => (
+                          <tr key={key} className={`${index % 2 === 0 ? 'bg-white' : 'bg-blue-50/30'} hover:bg-blue-50 transition-colors`}>
+                            <td className="border-b border-slate-200 px-2 md:px-4 py-3 text-xs md:text-sm text-slate-700 font-medium">
+                              {label}
+                            </td>
+                            {['good', 'bad', 'missing', 'not-working', 'needs-work'].map((condition) => (
+                              <td key={condition} className={`border-b border-slate-200 px-2 md:px-4 py-3 text-center ${getCellBackgroundClass(formData[key], condition)}`}>
+                                <input
+                                  type="radio"
+                                  name={key}
+                                  value={condition}
+                                  checked={formData[key] === condition}
+                                  onChange={(e) => handleInputChange(key, e.target.value)}
+                                  className="w-5 h-5 text-blue-600 focus:ring-blue-500 focus:ring-2 cursor-pointer"
+                                />
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <p className="text-xs text-slate-500 italic md:hidden flex items-center gap-1">
+                    <span>←</span> Scroll horizontally to see all options <span>→</span>
+                  </p>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      {t.toolsNotes}
+                    </label>
+                    <textarea
+                      value={formData.toolsEquipmentNotes}
+                      onChange={(e) => handleInputChange('toolsEquipmentNotes', e.target.value)}
+                      rows={3}
+                      className={`${inputClasses} resize-none`}
+                      placeholder={t.notesPlaceholder}
+                    />
+                  </div>
+                </section>
+
+                {/* Vehicle Emergency Equipment */}
+                <section className="space-y-4">
+                  <SectionHeader icon={AlertTriangle} title={t.vehicleEmergency} />
+                  
+                  <div className="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0">
+                    <table className="w-full border-collapse min-w-[700px] rounded-xl overflow-hidden shadow-sm">
+                      <thead>
+                        <tr className="bg-gradient-to-r from-blue-500 to-blue-600">
+                          <th className="px-2 md:px-4 py-3 text-left text-xs md:text-sm font-semibold text-white">
+                            {t.equipment}
+                          </th>
+                          <th className="px-2 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-white">
+                            {t.good}
+                          </th>
+                          <th className="px-2 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-white">
+                            {t.bad}
+                          </th>
+                          <th className="px-2 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-white">
+                            {t.missing}
+                          </th>
+                          <th className="px-2 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-white">
+                            {t.needService}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[
+                          { key: 'fireExtinguisherCondition', label: t.fireExtinguisher },
+                          { key: 'firstAidKitCondition', label: t.firstAidKit },
+                          { key: 'waterJugCondition', label: t.waterJug },
+                          { key: 'warningTriangleCondition', label: t.warningTriangle }
+                        ].map(({ key, label }, index) => (
+                          <tr key={key} className={`${index % 2 === 0 ? 'bg-white' : 'bg-blue-50/30'} hover:bg-blue-50 transition-colors`}>
+                            <td className="border-b border-slate-200 px-2 md:px-4 py-3 text-xs md:text-sm text-slate-700 font-medium">
+                              {label}
+                            </td>
+                            {['good', 'bad', 'missing', 'need-service'].map((condition) => (
+                              <td key={condition} className={`border-b border-slate-200 px-2 md:px-4 py-3 text-center ${getCellBackgroundClass(formData[key], condition)}`}>
+                                <input
+                                  type="radio"
+                                  name={key}
+                                  value={condition}
+                                  checked={formData[key] === condition}
+                                  onChange={(e) => handleInputChange(key, e.target.value)}
+                                  className="w-5 h-5 text-blue-600 focus:ring-blue-500 focus:ring-2 cursor-pointer"
+                                />
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <p className="text-xs text-slate-500 italic md:hidden flex items-center gap-1">
+                    <span>←</span> Scroll horizontally to see all options <span>→</span>
+                  </p>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      {t.emergencyNotes}
+                    </label>
+                    <textarea
+                      value={formData.emergencyEquipmentNotes}
+                      onChange={(e) => handleInputChange('emergencyEquipmentNotes', e.target.value)}
+                      rows={3}
+                      className={`${inputClasses} resize-none`}
+                      placeholder={t.notesPlaceholder}
+                    />
+                  </div>
+                </section>
+
+                {/* Vehicle Inspection */}
+                <section className="space-y-4">
+                  <SectionHeader icon={Truck} title={t.vehicleInspection} />
+                  
+                  <div className="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0">
+                    <table className="w-full border-collapse min-w-[800px] rounded-xl overflow-hidden shadow-sm">
+                      <thead>
+                        <tr className="bg-gradient-to-r from-blue-500 to-blue-600">
+                          <th className="px-2 md:px-4 py-3 text-left text-xs md:text-sm font-semibold text-white">
+                            {t.item}
+                          </th>
+                          <th className="px-2 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-white">
+                            {t.yes}
+                          </th>
+                          <th className="px-2 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-white">
+                            {t.no}
+                          </th>
+                          <th className="px-2 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-white">
+                            {t.good}
+                          </th>
+                          <th className="px-2 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-white">
+                            {t.bad}
+                          </th>
+                          <th className="px-2 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-white">
+                            {t.needsWork}
+                          </th>
+                          <th className="px-2 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-white">
+                            {t.needsAttention}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[
+                          { key: 'dashClean', label: t.dashClean },
+                          { key: 'tireCondition', label: t.tireCondition },
+                          { key: 'truckClean', label: t.truckClean },
+                          { key: 'tarpWorking', label: t.tarpWorking },
+                          { key: 'insideVehicleCondition', label: t.insideVehicle }
+                        ].map(({ key, label }, index) => (
+                          <tr key={key} className={`${index % 2 === 0 ? 'bg-white' : 'bg-blue-50/30'} hover:bg-blue-50 transition-colors`}>
+                            <td className="border-b border-slate-200 px-2 md:px-4 py-3 text-xs md:text-sm text-slate-700 font-medium">
+                              {label}
+                            </td>
+                            {['yes', 'no', 'good', 'bad', 'needs-work', 'needs-attention'].map((condition) => (
+                              <td key={condition} className={`border-b border-slate-200 px-2 md:px-4 py-3 text-center ${getCellBackgroundClass(formData[key], condition)}`}>
+                                <input
+                                  type="radio"
+                                  name={key}
+                                  value={condition}
+                                  checked={formData[key] === condition}
+                                  onChange={(e) => handleInputChange(key, e.target.value)}
+                                  className="w-5 h-5 text-blue-600 focus:ring-blue-500 focus:ring-2 cursor-pointer"
+                                />
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <p className="text-xs text-slate-500 italic md:hidden flex items-center gap-1">
+                    <span>←</span> Scroll horizontally to see all options <span>→</span>
+                  </p>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      {t.vehicleNotes}
+                    </label>
+                    <textarea
+                      value={formData.vehicleNotes}
+                      onChange={(e) => handleInputChange('vehicleNotes', e.target.value)}
+                      rows={3}
+                      className={`${inputClasses} resize-none`}
+                      placeholder={t.notesPlaceholder}
+                    />
+                  </div>
+                </section>
+
+                {/* Trailer Inspection */}
+                <section className="space-y-4">
+                  <SectionHeader icon={Truck} title={t.trailerInspection} />
+                  
+                  <div className="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0">
+                    <table className="w-full border-collapse min-w-[600px] rounded-xl overflow-hidden shadow-sm">
+                      <thead>
+                        <tr className="bg-gradient-to-r from-blue-500 to-blue-600">
+                          <th className="px-2 md:px-4 py-3 text-left text-xs md:text-sm font-semibold text-white">
+                            {t.item}
+                          </th>
+                          <th className="px-2 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-white">
+                            {t.goodCondition}
+                          </th>
+                          <th className="px-2 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-white">
+                            {t.badCondition}
+                          </th>
+                          <th className="px-2 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-white">
+                            {t.need}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[
+                          { key: 'trailerConnection', label: t.trailerConnection },
+                          { key: 'trailerBrakeAway', label: t.trailerBrakeAway },
+                          { key: 'trailerChains', label: t.trailerChains },
+                          { key: 'trailerLockPin', label: t.trailerLockPin },
+                          { key: 'trailerTires', label: t.trailerTires },
+                          { key: 'trailerSecured', label: t.trailerSecured },
+                          { key: 'trailerCleanliness', label: t.trailerCleanliness },
+                          { key: 'spareTire', label: t.spareTire }
+                        ].map(({ key, label }, index) => (
+                          <tr key={key} className={`${index % 2 === 0 ? 'bg-white' : 'bg-blue-50/30'} hover:bg-blue-50 transition-colors`}>
+                            <td className="border-b border-slate-200 px-2 md:px-4 py-3 text-xs md:text-sm text-slate-700 font-medium">
+                              {label}
+                            </td>
+                            {['good', 'bad', 'need'].map((condition) => (
+                              <td key={condition} className={`border-b border-slate-200 px-2 md:px-4 py-3 text-center ${getCellBackgroundClass(formData[key], condition)}`}>
+                                <input
+                                  type="radio"
+                                  name={key}
+                                  value={condition}
+                                  checked={formData[key] === condition}
+                                  onChange={(e) => handleInputChange(key, e.target.value)}
+                                  className="w-5 h-5 text-blue-600 focus:ring-blue-500 focus:ring-2 cursor-pointer"
+                                />
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <p className="text-xs text-slate-500 italic md:hidden flex items-center gap-1">
+                    <span>←</span> Scroll horizontally to see all options <span>→</span>
+                  </p>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      {t.trailerNotes}
+                    </label>
+                    <textarea
+                      value={formData.trailerNotes}
+                      onChange={(e) => handleInputChange('trailerNotes', e.target.value)}
+                      rows={3}
+                      className={`${inputClasses} resize-none`}
+                      placeholder={t.notesPlaceholder}
+                    />
+                  </div>
+                </section>
+
+                {/* Chemical Storage */}
+                <section className="space-y-4">
+                  <SectionHeader icon={Package} title={t.chemicalStorage} />
+                  
+                  <div className="bg-slate-50/80 rounded-xl p-4 border border-slate-200">
+                    <label className="block text-sm font-semibold text-slate-700 mb-3">
+                      {t.chemicalsQuestion} {t.required}
+                    </label>
+                    <div className="flex flex-wrap gap-4">
+                      {['yes', 'no'].map((value) => (
+                        <label key={value} className="flex items-center cursor-pointer group">
+                          <input
+                            type="radio"
+                            name="chemicalsStoredProperly"
+                            value={value}
+                            checked={formData.chemicalsStoredProperly === value}
+                            onChange={(e) => handleInputChange('chemicalsStoredProperly', e.target.value)}
+                            className="w-5 h-5 text-blue-600 focus:ring-blue-500 focus:ring-2 cursor-pointer"
+                            required
+                          />
+                          <span className="ml-2 text-sm md:text-base text-slate-700 font-medium group-hover:text-blue-600 transition-colors">
+                            {value === 'yes' ? t.yes : t.no}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Conditionally show issues only when "No" is selected */}
+                  {formData.chemicalsStoredProperly === 'no' && (
+                    <div className="bg-red-50 rounded-xl p-4 border border-red-200">
+                      <label className="block text-sm font-semibold text-red-800 mb-3">
+                        {t.selectAllApply}
+                      </label>
+                      <div className="space-y-2">
+                        {['Containers are not Labeled', 'Not Properly Stored', 'NA', 'Other'].map((option) => (
+                          <label key={option} className="flex items-center cursor-pointer group">
+                            <input
+                              type="checkbox"
+                              checked={formData.chemicalIssues.includes(option)}
+                              onChange={() => handleCheckboxChange('chemicalIssues', option)}
+                              className="w-5 h-5 text-red-600 focus:ring-red-500 focus:ring-2 rounded cursor-pointer"
+                            />
+                            <span className="ml-2 text-sm md:text-base text-red-800 font-medium group-hover:text-red-600 transition-colors">
+                              {option}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </section>
+
+                {/* Additional Notes and Follow-Up */}
+                <section className="space-y-4">
+                  <SectionHeader icon={FileText} title={t.additionalNotes} />
+                  
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      {t.additionalNotesLabel}
+                    </label>
+                    <textarea
+                      value={formData.additionalNotes}
+                      onChange={(e) => handleInputChange('additionalNotes', e.target.value)}
+                      rows={4}
+                      className={`${inputClasses} resize-none`}
+                      placeholder={t.notesPlaceholder}
+                    />
+                  </div>
+
+                  <div className="bg-orange-50 border-2 border-orange-400 rounded-xl p-4 md:p-5">
+                    <div className="flex items-start gap-3 mb-3">
+                      <span className="text-2xl">⚠️</span>
+                      <label className="block text-base md:text-lg font-bold text-orange-900">
+                        {t.safetyIssueASAP} {t.required}
+                      </label>
+                    </div>
+                    <div className="flex flex-wrap gap-4 ml-0 md:ml-11">
+                      {['yes', 'no'].map((value) => (
+                        <label key={value} className="flex items-center cursor-pointer group">
+                          <input
+                            type="radio"
+                            name="safetyIssueASAP"
+                            value={value}
+                            checked={formData.safetyIssueASAP === value}
+                            onChange={(e) => handleInputChange('safetyIssueASAP', e.target.value)}
+                            className="w-5 h-5 text-orange-600 focus:ring-orange-500 focus:ring-2 cursor-pointer"
+                            required
+                          />
+                          <span className="ml-2 text-sm md:text-base font-semibold text-orange-900 group-hover:text-orange-700 transition-colors">
+                            {value === 'yes' ? t.yes : t.no}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Conditionally show safety issues explanation only when "Yes" is selected */}
+                  {formData.safetyIssueASAP === 'yes' && (
+                    <div className="bg-red-50 border-2 border-red-400 rounded-xl p-4 md:p-5">
+                      <div className="flex items-start gap-2 mb-3">
+                        <span className="text-xl">🚨</span>
+                        <label className="block text-sm md:text-base font-bold text-red-900">
+                          {t.immediateSafetyQuestion}
+                        </label>
+                      </div>
+                      <textarea
+                        value={formData.immediateSafetyIssues}
+                        onChange={(e) => handleInputChange('immediateSafetyIssues', e.target.value)}
+                        rows={3}
+                        className="w-full px-4 py-3 text-base border-2 border-red-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white resize-none"
+                        placeholder={t.safetyConcernsPlaceholder}
+                      />
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      {t.followUpDate}
+                    </label>
+                    <input
+                      type="date"
+                      value={formData.followUpDate}
+                      onChange={(e) => handleInputChange('followUpDate', e.target.value)}
+                      className={inputClasses}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      📸 {t.googlePhotosLink}
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.googlePhotosLink}
+                      onChange={(e) => handleInputChange('googlePhotosLink', e.target.value)}
+                      className={inputClasses}
+                      placeholder={t.googlePhotosPlaceholder}
+                    />
+                  </div>
+                </section>
+
+                {/* Submit Button */}
+                <div className="flex justify-end pt-6 border-t-2 border-blue-500">
+                  <button
+                    type="submit"
+                    className="w-full md:w-auto px-8 py-3.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200"
+                  >
+                    {t.submitInspection}
+                  </button>
                 </div>
-              )}
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  {t.followUpDate}
-                </label>
-                <input
-                  type="date"
-                  value={formData.followUpDate}
-                  onChange={(e) => handleInputChange('followUpDate', e.target.value)}
-                  className="w-full px-3 py-2 text-base border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  📸 {t.googlePhotosLink}
-                </label>
-                <input
-                  type="text"
-                  value={formData.googlePhotosLink}
-                  onChange={(e) => handleInputChange('googlePhotosLink', e.target.value)}
-                  className="w-full px-3 py-2 text-base border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder={t.googlePhotosPlaceholder}
-                />
-              </div>
-            </section>
-
-            {/* Submit Button */}
-            <div className="flex justify-end pt-4 md:pt-6 border-t-2 border-blue-600">
-              <button
-                type="submit"
-                className="w-full md:w-auto px-6 md:px-8 py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
-              >
-                {t.submitInspection}
-              </button>
+              </form>
             </div>
-          </form>
+          </div>
         </div>
       </div>
     </div>
