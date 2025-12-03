@@ -283,11 +283,11 @@ export default function GateCheckForm() {
                       >
                         <option value="">Select division...</option>
                         <option value="Maintenance">Maintenance</option>
-                        <option value="Enhancement">Enhancement</option>
-                        <option value="Construction">Construction</option>
-                        <option value="Admin">Admin</option>
-                        <option value="Operations">Operations</option>
-                        <option value="Snow">Snow</option>
+                        <option value="Enhancements">Enhancement</option>
+                        <option value="Arbor">Arbor</option>
+                        <option value="Irrigation">Irrigation</option>
+                        <option value="Overhead">Overhead</option>
+                        <option value="Spray">Spray</option>
                       </SelectInput>
                     </div>
 
