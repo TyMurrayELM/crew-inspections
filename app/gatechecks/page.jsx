@@ -117,10 +117,17 @@ export default function GateCheckForm() {
   });
 
   const handleInputChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData(prev => {
+      const updates = { [field]: value };
+      // Clear crew selection when location changes
+      if (field === 'location') {
+        updates.crewNumber = '';
+      }
+      return { ...prev, ...updates };
+    });
   };
 
-  // Get available crews - show all crews from all locations
+  // Get available crews based on selected location
   const getAvailableCrews = () => {
     const allCrews = [
       ...crewsByBranch['Las Vegas'],
@@ -130,7 +137,16 @@ export default function GateCheckForm() {
       ...crewsByBranch['Corporate']
     ];
     
-    return allCrews.sort();
+    // Filter based on location
+    if (formData.location === 'las-vegas') {
+      return allCrews.filter(crew => crew.startsWith('LV')).sort();
+    } else if (formData.location) {
+      // Any Phoenix location or Corporate - show PHX crews
+      return allCrews.filter(crew => crew.startsWith('PHX')).sort();
+    }
+    
+    // No location selected - return empty (user must select location first)
+    return [];
   };
 
   const handleSubmit = async (e) => {
@@ -193,13 +209,14 @@ export default function GateCheckForm() {
   const inputClasses = "w-full px-4 py-3 text-base text-slate-900 bg-slate-50/80 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white transition-all duration-200";
   
   // Modern Select with custom chevron
-  const SelectInput = ({ value, onChange, children, required = false }) => (
+  const SelectInput = ({ value, onChange, children, required = false, disabled = false }) => (
     <div className="relative">
       <select
         value={value}
         onChange={onChange}
-        className={`${inputClasses} appearance-none cursor-pointer pr-10 ${!value ? 'text-slate-500' : ''}`}
+        className={`${inputClasses} appearance-none cursor-pointer pr-10 ${!value ? 'text-slate-500' : ''} ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`}
         required={required}
+        disabled={disabled}
         style={{ color: value ? '#0f172a' : '#64748b' }}
       >
         {children}
@@ -283,11 +300,11 @@ export default function GateCheckForm() {
                       >
                         <option value="">Select division...</option>
                         <option value="Maintenance">Maintenance</option>
-                        <option value="Enhancements">Enhancement</option>
+                        <option value="Enhancements">Enhancements</option>
                         <option value="Arbor">Arbor</option>
                         <option value="Irrigation">Irrigation</option>
-                        <option value="Overhead">Overhead</option>
                         <option value="Spray">Spray</option>
+                        <option value="Overhead">Overhead</option>
                       </SelectInput>
                     </div>
 
@@ -299,14 +316,22 @@ export default function GateCheckForm() {
                         value={formData.crewNumber}
                         onChange={(e) => handleInputChange('crewNumber', e.target.value)}
                         required
+                        disabled={!formData.location}
                       >
-                        <option value="">Select Crew...</option>
+                        <option value="">
+                          {formData.location ? 'Select Crew...' : 'Select location first'}
+                        </option>
                         {getAvailableCrews().map((crew) => (
                           <option key={crew} value={crew}>
                             {crew}
                           </option>
                         ))}
                       </SelectInput>
+                      {!formData.location && (
+                        <p className="mt-1.5 text-xs text-slate-500">
+                          Please select a location first to see available crews
+                        </p>
+                      )}
                     </div>
                     
                     <div className="md:col-span-2">
