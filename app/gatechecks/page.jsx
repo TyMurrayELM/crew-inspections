@@ -190,7 +190,7 @@ export default function GateCheckForm() {
   );
 
   // Modern Input styling
-  const inputClasses = "w-full px-4 py-3 text-base bg-slate-50/80 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white transition-all duration-200";
+  const inputClasses = "w-full px-4 py-3 text-base text-slate-900 bg-slate-50/80 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white transition-all duration-200";
   
   // Modern Select with custom chevron
   const SelectInput = ({ value, onChange, children, required = false }) => (
@@ -198,8 +198,9 @@ export default function GateCheckForm() {
       <select
         value={value}
         onChange={onChange}
-        className={`${inputClasses} appearance-none cursor-pointer pr-10`}
+        className={`${inputClasses} appearance-none cursor-pointer pr-10 ${!value ? 'text-slate-500' : ''}`}
         required={required}
+        style={{ color: value ? '#0f172a' : '#64748b' }}
       >
         {children}
       </select>
