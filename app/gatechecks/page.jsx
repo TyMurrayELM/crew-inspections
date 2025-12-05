@@ -61,8 +61,6 @@ export default function GateCheckForm() {
     ],
     'Phoenix - Southwest': [
       'PHX_SW_ARBOR_Team 1',
-      'PHX_SW_ENHAN_Team 1',
-      'PHX_SW_ENHAN_Team 2',
       'PHX_SW_IRR_Tech 1',
       'PHX_SW_IRR_Tech 2',
       'PHX_SW_IRR_Tech 3',
@@ -79,10 +77,17 @@ export default function GateCheckForm() {
       'PHX_SW_MAINT_Team 8'
     ],
     'Corporate': [
-      'PHX_OVERHEAD_Landscape Supervisor',
-      'PHX_OVERHEAD_Irrigation Supervisor',
-      'PHX_OVERHEAD_Safety',
-      'PHX_OVERHEAD_Account Manager/BDM'
+      'PHX_ARBOR_Team 1',
+      'PHX_ARBOR_Team 2',
+      'PHX_ARBOR_Team 3',
+      'PHX_ARBOR_Team 4',
+      'PHX_ARBOR_Team 4',
+      'PHX_ARBOR_Team 5',
+      'PHX_ARBOR_Team 6',
+      'PHX_ENHAN_Team 1',
+      'PHX_ENHAN_Team 2',
+      'PHX_ENHAN_Team 3',
+      'PHX_ENHAN_Team 4'
     ]
   };
 
