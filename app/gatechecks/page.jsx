@@ -81,7 +81,6 @@ export default function GateCheckForm() {
       'PHX_ARBOR_Team 2',
       'PHX_ARBOR_Team 3',
       'PHX_ARBOR_Team 4',
-      'PHX_ARBOR_Team 4',
       'PHX_ARBOR_Team 5',
       'PHX_ARBOR_Team 6',
       'PHX_ENHAN_Team 1',
