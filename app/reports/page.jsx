@@ -1240,7 +1240,7 @@ function ReportsPageContent() {
               {/* New Button */}
               <div className="flex justify-center">
                 <Link
-                  href={activeView === 'inspections' ? '/' : '/gatechecks'}
+                  href={activeView === 'inspections' ? '/inspection' : '/gatechecks'}
                   className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-slate-800 to-slate-900 text-white font-semibold rounded-xl hover:shadow-xl hover:shadow-slate-900/20 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
                 >
                   <Plus className="w-5 h-5" />
@@ -1618,7 +1618,7 @@ function ReportsPageContent() {
                   </div>
                   <p className="text-slate-500 text-base md:text-lg mb-4">No inspections found.</p>
                   <Link
-                    href="/"
+                    href="/inspection"
                     className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/25 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
                   >
                     <Plus className="w-5 h-5" />
