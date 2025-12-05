@@ -510,7 +510,7 @@ export default function GateCheckForm() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="bg-slate-50/80 rounded-xl p-4 border border-slate-200">
                       <label className="block text-sm font-semibold text-slate-700 mb-3">
-                        5 Safety Cones *
+                        Safety Cones Available*
                       </label>
                       <div className="flex flex-wrap gap-4">
                         {['yes', 'no'].map((value) => (
