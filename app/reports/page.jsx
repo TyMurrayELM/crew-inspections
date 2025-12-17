@@ -102,6 +102,83 @@ function ReportsPageContent() {
     });
   };
 
+  // Helper function to check if a gate check has any "no" responses
+  const hasNoResponses = (gateCheck) => {
+    const fieldsToCheck = [
+      gateCheck.all_employees_have_ppe,
+      gateCheck.lights_working,
+      gateCheck.mirrors_intact,
+      gateCheck.license_plate_visible,
+      gateCheck.registration_insurance_card,
+      gateCheck.load_secured,
+      gateCheck.trimmer_racks_locked,
+      gateCheck.safety_pins_in_place,
+      gateCheck.tires_inflated,
+      gateCheck.spare_tire_available,
+      gateCheck.chemical_labeled_secured,
+      gateCheck.five_safety_cones,
+      gateCheck.first_aid_kit_fire_extinguisher
+    ];
+    return fieldsToCheck.some(field => field?.toLowerCase() === 'no');
+  };
+
+  // Helper function to check if a gate check has any "needs service" responses
+  const hasNeedsService = (gateCheck) => {
+    const fieldsToCheck = [
+      gateCheck.all_employees_have_ppe,
+      gateCheck.lights_working,
+      gateCheck.mirrors_intact,
+      gateCheck.license_plate_visible,
+      gateCheck.registration_insurance_card,
+      gateCheck.load_secured,
+      gateCheck.trimmer_racks_locked,
+      gateCheck.safety_pins_in_place,
+      gateCheck.tires_inflated,
+      gateCheck.spare_tire_available,
+      gateCheck.chemical_labeled_secured,
+      gateCheck.five_safety_cones,
+      gateCheck.first_aid_kit_fire_extinguisher
+    ];
+    return fieldsToCheck.some(field => {
+      const val = field?.toLowerCase();
+      return val === 'needs service' || val === 'needs-service' || val === 'need-service' || val === 'need service';
+    });
+  };
+
+  // Gate Check Alert Icons Component
+  const GateCheckAlerts = ({ gateCheck }) => {
+    const hasNo = hasNoResponses(gateCheck);
+    const hasService = hasNeedsService(gateCheck);
+    
+    if (!hasNo && !hasService) return null;
+    
+    return (
+      <div className="flex items-center gap-1">
+        {hasNo && (
+          <span 
+            className="inline-flex items-center justify-center w-6 h-6 bg-red-100 text-red-600 rounded-full border border-red-200" 
+            title="Has items marked 'No'"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </span>
+        )}
+        {hasService && (
+          <span 
+            className="inline-flex items-center justify-center w-6 h-6 bg-yellow-100 text-yellow-600 rounded-full border border-yellow-200" 
+            title="Has items needing service"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </span>
+        )}
+      </div>
+    );
+  };
+
   // Fixed formatDate function that handles date-only strings as local dates
   // This prevents the timezone shift that was causing dates to display a day behind
   const formatDate = (dateString) => {
@@ -1515,9 +1592,13 @@ function ReportsPageContent() {
                 {/* Mobile Card View (shown on screens < 768px) */}
                 <div className="md:hidden space-y-3">
                   {filteredGateChecks.map((gateCheck) => (
-                    <div key={gateCheck.id} className="bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden">
+                    <div key={gateCheck.id} className={`rounded-xl shadow-lg border overflow-hidden ${
+                      hasNoResponses(gateCheck) ? 'bg-red-50 border-red-200' : 'bg-white border-slate-100'
+                    }`}>
                       <div
-                        className="p-4 flex items-center gap-3 cursor-pointer active:bg-slate-50 transition-colors"
+                        className={`p-4 flex items-center gap-3 cursor-pointer transition-colors ${
+                          hasNoResponses(gateCheck) ? 'active:bg-red-100' : 'active:bg-slate-50'
+                        }`}
                         onClick={() => toggleGateCheck(gateCheck.id)}
                       >
                         <button className="text-slate-600 flex-shrink-0">
@@ -1528,6 +1609,9 @@ function ReportsPageContent() {
                             <div className="flex-1 min-w-0">
                               <p className="font-semibold text-slate-800 text-sm truncate">{gateCheck.driver_name}</p>
                               <p className="text-xs text-slate-600 mt-1">{formatDate(gateCheck.inspection_date)}</p>
+                            </div>
+                            <div className="ml-2 flex-shrink-0">
+                              <GateCheckAlerts gateCheck={gateCheck} />
                             </div>
                           </div>
                           <div className="flex flex-wrap gap-2 mt-2">
@@ -1584,13 +1668,20 @@ function ReportsPageContent() {
                           >
                             Driver <GateCheckSortIcon field="driver_name" />
                           </th>
+                          <th className="px-4 py-3.5 text-center text-xs font-semibold text-white uppercase">
+                            Alerts
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
                         {filteredGateChecks.map((gateCheck, index) => [
                           <tr 
                             key={gateCheck.id}
-                            className={`transition-colors cursor-pointer border-b border-slate-100 hover:bg-blue-50 ${index % 2 === 0 ? 'bg-white' : 'bg-blue-50/30'}`}
+                            className={`transition-colors cursor-pointer border-b border-slate-100 ${
+                              hasNoResponses(gateCheck) 
+                                ? 'bg-red-50 hover:bg-red-100' 
+                                : `hover:bg-blue-50 ${index % 2 === 0 ? 'bg-white' : 'bg-blue-50/30'}`
+                            }`}
                             onClick={() => toggleGateCheck(gateCheck.id)}
                           >
                             <td className="px-4 py-3 text-center">
@@ -1604,10 +1695,13 @@ function ReportsPageContent() {
                             <td className="px-4 py-3 text-sm text-slate-700">{getDepartmentDisplay(gateCheck.division)}</td>
                             <td className="px-4 py-3 text-sm text-slate-700">{gateCheck.crew_number}</td>
                             <td className="px-4 py-3 text-sm text-slate-700">{gateCheck.driver_name}</td>
+                            <td className="px-4 py-3 text-center">
+                              <GateCheckAlerts gateCheck={gateCheck} />
+                            </td>
                           </tr>,
                           expandedGateCheckId === gateCheck.id && (
                             <tr key={`${gateCheck.id}-details`}>
-                              <td colSpan="7" className="p-0">
+                              <td colSpan="8" className="p-0">
                                 <GateCheckDetails gateCheck={gateCheck} />
                               </td>
                             </tr>
