@@ -102,8 +102,25 @@ function ReportsPageContent() {
     });
   };
 
+  // Fixed formatDate function that handles date-only strings as local dates
+  // This prevents the timezone shift that was causing dates to display a day behind
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
+    
+    // Check if this is a date-only string (YYYY-MM-DD format)
+    // These should be treated as local dates, not UTC
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+      const [year, month, day] = dateString.split('-').map(Number);
+      // Create date using local timezone (months are 0-indexed)
+      const date = new Date(year, month - 1, day);
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      });
+    }
+    
+    // For full datetime strings, use standard parsing
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
       month: 'short',
