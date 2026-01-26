@@ -57,7 +57,8 @@ export default function GateCheckForm() {
       'PHX_SE_MAINT_Team 4',
       'PHX_SE_MAINT_Team 5',
       'PHX_SE_MAINT_Team 6',
-      'PHX_SE_MAINT_Team 7'
+      'PHX_SE_MAINT_Team 7',
+      'PHX_SE_MAINT_Team 9'
     ],
     'Phoenix - Southwest': [
       'PHX_SW_ARBOR_Team 1',
