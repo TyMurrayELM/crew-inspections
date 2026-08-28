@@ -8,6 +8,10 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
 // Initialize Supabase client
+// Gate check creation is paused for now (history stays visible).
+// Flip to true to bring back the New Gate Check buttons.
+const GATE_CHECK_CREATION_ENABLED = false;
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -1331,7 +1335,8 @@ function ReportsPageContent() {
                 </div>
               </div>
 
-              {/* New Button */}
+              {/* New Button (gate-check creation hidden while paused) */}
+              {(activeView === 'inspections' || GATE_CHECK_CREATION_ENABLED) && (
               <div className="flex justify-center">
                 <Link
                   href={activeView === 'inspections' ? '/inspection' : '/gatechecks'}
@@ -1341,6 +1346,7 @@ function ReportsPageContent() {
                   {activeView === 'inspections' ? 'New Inspection' : 'New Gate Check'}
                 </Link>
               </div>
+              )}
             </div>
           </div>
         </div>
@@ -1578,6 +1584,7 @@ function ReportsPageContent() {
                     <ClipboardCheck className="w-8 h-8 text-slate-400" />
                   </div>
                   <p className="text-slate-500 text-base md:text-lg mb-4">No gate checks found.</p>
+                  {GATE_CHECK_CREATION_ENABLED && (
                   <Link
                     href="/gatechecks"
                     className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/25 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
@@ -1585,6 +1592,7 @@ function ReportsPageContent() {
                     <Plus className="w-5 h-5" />
                     Create First Gate Check
                   </Link>
+                  )}
                 </div>
               </div>
             ) : (

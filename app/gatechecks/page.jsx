@@ -2,8 +2,13 @@
 
 import { useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
+import Link from 'next/link';
 import Header from '../components/Header';
 import { ClipboardCheck, FileText, ChevronDown, Truck, Shield, Wrench, UserCheck } from 'lucide-react';
+
+// Gate check creation is paused for now — the form below is intact,
+// flip this to true to bring it back.
+const GATE_CHECK_CREATION_ENABLED = false;
 
 // Initialize Supabase client
 const supabase = createClient(
@@ -229,6 +234,33 @@ export default function GateCheckForm() {
       <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
     </div>
   );
+
+  if (!GATE_CHECK_CREATION_ENABLED) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-emerald-50/20 flex items-center justify-center p-4">
+        <div className="relative max-w-md w-full">
+          <div className="absolute -inset-1 bg-gradient-to-r from-slate-500/5 to-slate-500/5 rounded-2xl blur-xl" />
+          <div className="relative bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-slate-100 p-8 md:p-12 text-center">
+            <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <ClipboardCheck className="w-8 h-8 text-slate-400" />
+            </div>
+            <h1 className="text-lg font-bold text-slate-800 mb-2">Gate checks are paused</h1>
+            <p className="text-slate-500 text-sm mb-6">
+              New gate checks aren&apos;t being collected right now. Past gate checks are
+              still available in Reports.
+            </p>
+            <Link
+              href="/reports?view=gatechecks"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/25 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
+            >
+              <FileText className="w-5 h-5" />
+              View Gate Check History
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-4 md:py-8 px-3 md:px-4">
